@@ -1,0 +1,62 @@
+package com.todocodeacademy.sistema_planilla.infraestructure.repository.adapter;
+
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.AsistenciaRepositoryPort;
+import com.todocodeacademy.sistema_planilla.domain.model.Asistencia;
+import com.todocodeacademy.sistema_planilla.domain.model.Empleado;
+import com.todocodeacademy.sistema_planilla.infraestructure.entity.AsistenciaEntity;
+import com.todocodeacademy.sistema_planilla.infraestructure.entity.EmpleadoEntity;
+import com.todocodeacademy.sistema_planilla.infraestructure.mapper.AsistenciaEntMapper;
+import com.todocodeacademy.sistema_planilla.infraestructure.mapper.EmpleadoEntMapper;
+import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaAsistenciaRepository;
+import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaEmpresaRepository;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+public class AsistenciaRepositoryAdapter implements AsistenciaRepositoryPort {
+
+    private final JpaAsistenciaRepository repository;
+
+    private final JpaEmpresaRepository empRepo;
+
+    private final EmpleadoEntMapper mapperEmp;
+
+    private final AsistenciaEntMapper mapper;
+
+    @Override
+    public List<Asistencia> findAll() {
+        return repository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<Asistencia> findById(Long id) {
+        return repository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Asistencia> findByEmpleadoAndFecha(Empleado empleado, LocalDate fecha) {
+        EmpleadoEntity emple = mapperEmp.toEntity(empleado);
+        return repository.findByEmpleadoAndFecha(emple, fecha).map(mapper::toDomain);
+
+    }
+
+    @Override
+    public Asistencia save(Asistencia banco) {
+
+        AsistenciaEntity entity = mapper.toEntity(banco);
+
+        AsistenciaEntity saveEntity = repository.save(entity);
+
+        return mapper.toDomain(saveEntity);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        repository.deleteById(id);
+    }
+}
