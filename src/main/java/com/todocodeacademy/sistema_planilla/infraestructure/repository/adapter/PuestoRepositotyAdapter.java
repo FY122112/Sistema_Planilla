@@ -5,11 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.Puesto;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.PuestoEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaPuestoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 @RequiredArgsConstructor
 public class PuestoRepositotyAdapter implements PuestoRepositoryPort {
 
@@ -43,7 +44,7 @@ public class PuestoRepositotyAdapter implements PuestoRepositoryPort {
 
     @Override
     public Optional<Puesto> findByNombrePuesto(String name) {
-        return repository.findByNombrePuesto(name).map(mapper::toDomain);
+        return repository.findByNombre(name).map(mapper::toDomain);
     }
 
     @Override

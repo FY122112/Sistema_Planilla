@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.DetallePlanilla;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.DetallePlanillaEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaDetallePlanillaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class DetallePlanillaRepositoryAdapter implements DetallePlanillaRepositoryPort {
 

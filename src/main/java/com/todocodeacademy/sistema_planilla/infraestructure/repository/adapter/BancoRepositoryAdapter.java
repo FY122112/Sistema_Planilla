@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.Banco;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.BancoEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaBancoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class BancoRepositoryAdapter implements BancoRepositoryPort {
 

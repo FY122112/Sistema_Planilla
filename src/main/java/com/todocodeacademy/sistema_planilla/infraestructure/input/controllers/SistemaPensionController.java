@@ -5,14 +5,10 @@ import com.todocodeacademy.sistema_planilla.domain.model.SistemaPension;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.SistemaPensionRequestDTO;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.SistemaPensionResponseDTO;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.SistemaPensionMapper;
-
 import jakarta.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -24,19 +20,18 @@ import java.util.List;
 public class SistemaPensionController {
 
     private final SistemaPensionService service;
-
     private final SistemaPensionMapper mapper;
+
     // =========================
     // 📄 FIND ALL
     // =========================
     @GetMapping
-    public ResponseEntity<List<SistemaPensionResponseDTO>>
-    findAll() {
+    public ResponseEntity<List<SistemaPensionResponseDTO>> findAll() {
 
         List<SistemaPensionResponseDTO> response =
                 service.findAll()
                         .stream()
-                        .map(SistemaPensionMapper::toResponseDTO)
+                        .map(mapper::toResponseDTO)   // ← ya no static
                         .toList();
 
         return ResponseEntity.ok(response);
@@ -46,13 +41,14 @@ public class SistemaPensionController {
     // 🔍 FIND BY ID
     // =========================
     @GetMapping("/{id}")
-    public ResponseEntity<SistemaPensionResponseDTO>
-    findById(@PathVariable Long id) {
+    public ResponseEntity<SistemaPensionResponseDTO> findById(
+            @PathVariable Long id
+    ) {
 
         SistemaPension entity = service.findById(id);
 
         return ResponseEntity.ok(
-                SistemaPensionMapper.toResponseDTO(entity)
+                mapper.toResponseDTO(entity)   // ← ya no static
         );
     }
 
@@ -60,22 +56,21 @@ public class SistemaPensionController {
     // 💾 SAVE
     // =========================
     @PostMapping
-    public ResponseEntity<SistemaPensionResponseDTO>
-    save(
+    public ResponseEntity<SistemaPensionResponseDTO> save(
             @Valid
             @RequestBody
             SistemaPensionRequestDTO request
     ) {
 
         SistemaPension entity =
-                SistemaPensionMapper.toEntity(request);
+                mapper.toEntity(request);   // ← ya no static
 
         entity = service.save(entity);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        SistemaPensionMapper.toResponseDTO(entity)
+                        mapper.toResponseDTO(entity)
                 );
     }
 
@@ -83,8 +78,7 @@ public class SistemaPensionController {
     // ✏️ UPDATE
     // =========================
     @PutMapping("/{id}")
-    public ResponseEntity<SistemaPensionResponseDTO>
-    update(
+    public ResponseEntity<SistemaPensionResponseDTO> update(
             @PathVariable Long id,
 
             @Valid
@@ -93,12 +87,12 @@ public class SistemaPensionController {
     ) {
 
         SistemaPension entity =
-                SistemaPensionMapper.toEntity(request);
+                mapper.toEntity(request);   // ← ya no static
 
         entity = service.update(id, entity);
 
         return ResponseEntity.ok(
-                SistemaPensionMapper.toResponseDTO(entity)
+                mapper.toResponseDTO(entity)
         );
     }
 
@@ -106,8 +100,9 @@ public class SistemaPensionController {
     // ❌ DELETE
     // =========================
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>
-    delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id
+    ) {
 
         service.deleteById(id);
 

@@ -21,7 +21,8 @@ public class PermissionService implements PermissionServicePort {
 
     @Override
     public Permission findById(Long id) {
-        return perRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("No existe el permission en la base de datos"));
+        return perRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe el permission en la base de datos"));
     }
 
     @Override
@@ -31,28 +32,27 @@ public class PermissionService implements PermissionServicePort {
 
     @Override
     public Permission update(Long id, Permission permission) {
+        Permission update = perRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe el permission en la base de datos"));
 
-        Permission update = perRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("No existe el permission en la base de datos"));
-
-        if (permission.getName() != null){
+        if (permission.getName() != null) {
             update.actualizarName(permission.getName());
         }
-        if (permission.getDescription() != null){
+        if (permission.getDescription() != null) {
             update.actualizarDescripcion(permission.getDescription());
         }
 
-        return perRepo.save(permission);
-
+        return perRepo.save(update); // ✅ Guardamos el objeto modificado
     }
 
     @Override
     public void deleteById(Long id) {
-            perRepo.deleteById(id);
+        perRepo.deleteById(id);
     }
 
     @Override
     public Permission findByNombre(String nombre) {
-        return perRepo.findByNombre(nombre).orElseThrow(()-> new IllegalArgumentException("No existe este nombre de permiso en la base de datos"));
+        return perRepo.findByNombre(nombre)
+                .orElseThrow(() -> new IllegalArgumentException("No existe este nombre de permiso en la base de datos"));
     }
-
 }

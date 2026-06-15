@@ -14,14 +14,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DetallePlanillaEntMapper {
 
-    private final PlanillaEntMapper mapperPlanilla;
+    // 🔥 Eliminamos la dependencia a PlanillaEntMapper
     private final EmpleadoEntMapper mapperEmpleado;
     private final MovimientoPlanillaEntMapper mapperMovimiento;
     private final BoletaEntMapper mapperBoleta;
 
-    public DetallePlanilla toDomain(DetallePlanillaEntity entity){
-
-        if(entity == null) return null;
+    public DetallePlanilla toDomain(DetallePlanillaEntity entity) {
+        if (entity == null) return null;
 
         List<MovimientoPlanilla> movimientos = entity.getMovimientosPlanilla() != null
                 ? entity.getMovimientosPlanilla()
@@ -49,21 +48,18 @@ public class DetallePlanillaEntMapper {
         );
     }
 
-    public DetallePlanillaEntity toEntity(DetallePlanilla domain){
-
-        if(domain == null) return null;
+    public DetallePlanillaEntity toEntity(DetallePlanilla domain) {
+        if (domain == null) return null;
 
         DetallePlanillaEntity entity = new DetallePlanillaEntity();
-
         entity.setIdDetalle(domain.getIdDetalle());
 
-        // solo referencia
+        // solo referencia mínima a la planilla
         PlanillaEntity p = new PlanillaEntity();
         p.setIdPlanilla(domain.getPlanilla().getIdPlanilla());
         entity.setPlanilla(p);
 
         entity.setEmpleado(mapperEmpleado.toEntity(domain.getEmpleado()));
-
         entity.setSueldoBase(domain.getSueldoBase());
         entity.setAsignacionFamiliar(domain.getAsignacionFamiliar());
         entity.setRemuneracionComputableAfecta(domain.getRemuneracionComputableAfecta());

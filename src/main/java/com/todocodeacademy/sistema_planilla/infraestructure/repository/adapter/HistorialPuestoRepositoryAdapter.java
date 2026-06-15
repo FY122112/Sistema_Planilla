@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.HistorialPuesto;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.HistorialPuestoEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaHistorialPuestoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class HistorialPuestoRepositoryAdapter implements HistorialPuestoRepositoryPort {
 

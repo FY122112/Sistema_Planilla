@@ -5,17 +5,17 @@ import com.todocodeacademy.sistema_planilla.domain.model.ConceptoPago;
 import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoConcepto;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.ConceptoPagoEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaConceptoPagoRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class ConceptoPagoRespositoryAdapter implements ConceptoPagoRepositoryPort {
 
     private final JpaConceptoPagoRepository repository;
-
     private final ConceptoPagoEntMapper mapper;
 
     @Override
@@ -27,7 +27,7 @@ public class ConceptoPagoRespositoryAdapter implements ConceptoPagoRepositoryPor
 
     @Override
     public Optional<ConceptoPago> findById(Long id) {
-        return  repository.findById(id).map(mapper::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
@@ -47,17 +47,32 @@ public class ConceptoPagoRespositoryAdapter implements ConceptoPagoRepositoryPor
 
     @Override
     public Optional<ConceptoPago> findByNombreConceptoAndTipo(String nombreConcepto, TipoConcepto tipo) {
-        return repository.findByNombreConceptoAndTipo(nombreConcepto, tipo).map(mapper::toDomain);
+        return repository.findByNombreConceptoAndTipoConcepto(nombreConcepto, tipo.name())
+                .map(mapper::toDomain);
     }
 
     @Override
     public List<ConceptoPago> findByTipo(TipoConcepto tipo) {
-        return repository.findByTipo(tipo).stream().map(concepto -> mapper.toDomain(concepto)).toList();
-
+        return repository.findByTipoConcepto(tipo.name())
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
-    public List<ConceptoPago> findByAfectoOnpOrAfectoAfpOrAfectoEssalud(Boolean afectoOnp, Boolean afectoAfp, Boolean afectoEssalud) {
-        return List.of();
+    public List<ConceptoPago> findByAfectoEssalud(Boolean afectoEssalud) {
+        return repository.findByAfectoEssalud(afectoEssalud)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
+
+
+    /*@Override
+    public List<ConceptoPago> findByAfectoEssalud(Boolean afectoEssalud) {
+        return repository.findByAfectoEssalud(afectoEssalud)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }*/
 }

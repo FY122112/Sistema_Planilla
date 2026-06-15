@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmpresaService implements EmpresaServicePort {
 
-    private EmpresaRepositoryPort repository;;
+    private final EmpresaRepositoryPort repository;
 
     @Override
     public List<Empresa> findAll() {
@@ -21,7 +21,9 @@ public class EmpresaService implements EmpresaServicePort {
 
     @Override
     public Empresa findById(Long id) {
-        return repository.findById(id).orElseThrow(()-> new IllegalArgumentException("Empresa no encontrada"));
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Empresa no encontrada"));
     }
 
     @Override
@@ -31,17 +33,23 @@ public class EmpresaService implements EmpresaServicePort {
 
     @Override
     public Empresa update(Long id, Empresa empresa) {
-        Empresa update = repository.findById(id).orElseThrow(()-> new IllegalArgumentException("Empresa no encontrada"));
 
-        if(empresa.getDireccion()!=null && empresa.getTelefono() != null && empresa.getCorreo() != null){
+        Empresa update = repository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Empresa no encontrada"));
 
-            update.actualizarDatos(empresa.getDireccion(), empresa.getTelefono(), empresa.getCorreo());
+        if (empresa.getDireccion() != null
+                && empresa.getTelefono() != null
+                && empresa.getCorreo() != null) {
 
+            update.actualizarDatos(
+                    empresa.getDireccion(),
+                    empresa.getTelefono(),
+                    empresa.getCorreo()
+            );
         }
 
-        update =  repository.save(update);
-        return update;
-
+        return repository.save(update);
     }
 
     @Override
@@ -51,7 +59,9 @@ public class EmpresaService implements EmpresaServicePort {
 
     @Override
     public Empresa buscarPorRuc(String ruc) {
-        return repository.findByRuc(ruc).orElseThrow(()-> new IllegalArgumentException("Empresa con ruc no encontrada"));
+        return repository.findByRuc(ruc)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Empresa con ruc no encontrada"));
     }
 
     @Override

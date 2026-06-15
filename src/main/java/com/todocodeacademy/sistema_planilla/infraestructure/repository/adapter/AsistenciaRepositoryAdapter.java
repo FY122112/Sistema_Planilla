@@ -10,11 +10,13 @@ import com.todocodeacademy.sistema_planilla.infraestructure.mapper.EmpleadoEntMa
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaAsistenciaRepository;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaEmpresaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class AsistenciaRepositoryAdapter implements AsistenciaRepositoryPort {
 

@@ -11,10 +11,12 @@ import java.util.Optional;
 
 public interface JpaParametroLegalRepository extends JpaRepository<ParametroLegalEntity,Long> {
 
-    // Busca un parámetro legal por su código y que esté vigente en una fecha dada.
-    @Query("SELECT pl FROM ParametroLegal pl WHERE pl.codigo = :codigo AND pl.fechaInicioVigencia <= :fecha " +
+    @Query("SELECT pl FROM ParametroLegalEntity pl " +
+            "WHERE pl.codigo = :codigo " +
+            "AND pl.fechaInicioVigencia <= :fecha " +
             "AND (pl.fechaFinVigencia IS NULL OR pl.fechaFinVigencia >= :fecha)")
-    Optional<ParametroLegalEntity> findVigenteByCodigoAndFecha(@Param("codigo") String codigo, @Param("fecha") LocalDate fecha);
+    Optional<ParametroLegalEntity> findVigenteByCodigoAndFecha(@Param("codigo") String codigo,
+                                                               @Param("fecha") LocalDate fecha);
 
     // Método para obtener el valor más reciente de un parámetro por su código
     Optional<ParametroLegalEntity> findTopByCodigoOrderByFechaInicioVigenciaDesc(String codigo); // ADICIONADO

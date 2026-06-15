@@ -3,7 +3,9 @@ package com.todocodeacademy.sistema_planilla.infraestructure.input.mapper;
 import com.todocodeacademy.sistema_planilla.domain.model.ConceptoPago;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.ConceptoPagoRequestDTO;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.ConceptoPagoResponseDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ConceptoPagoMapper {
 
     public ConceptoPago toDomain(

@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.Empresa;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.EmpresaEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaEmpresaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class EmpresaRepositoryAdapter implements EmpresaRepositoryPort {
 

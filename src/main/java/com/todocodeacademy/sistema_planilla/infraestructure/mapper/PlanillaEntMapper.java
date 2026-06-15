@@ -21,7 +21,6 @@ public class PlanillaEntMapper {
     // ENTITY → DOMAIN
     // =========================
     public Planilla toDomain(PlanillaEntity entity) {
-
         if (entity == null) return null;
 
         List<DetallePlanilla> detalles = new ArrayList<>();
@@ -39,7 +38,7 @@ public class PlanillaEntMapper {
                 entity.getUpdateAt()
         );
 
-        // 👇 IMPORTANTE: después de crear la planilla
+        // 👇 después de crear la planilla, agregamos los detalles
         if (entity.getDetallesPlanilla() != null) {
             for (DetallePlanillaEntity det : entity.getDetallesPlanilla()) {
                 DetallePlanilla d = detalleMapper.toDomain(det);
@@ -54,11 +53,9 @@ public class PlanillaEntMapper {
     // DOMAIN → ENTITY
     // =========================
     public PlanillaEntity toEntity(Planilla domain) {
-
         if (domain == null) return null;
 
         PlanillaEntity entity = new PlanillaEntity();
-
         entity.setIdPlanilla(domain.getIdPlanilla());
         entity.setMes(domain.getMes());
         entity.setAnio(domain.getAnio());
@@ -68,12 +65,11 @@ public class PlanillaEntMapper {
         entity.setCerrada(domain.estaCerrada());
 
         if (domain.getDetallesPlanilla() != null) {
-
             List<DetallePlanillaEntity> detalles = domain.getDetallesPlanilla()
                     .stream()
                     .map(det -> {
                         DetallePlanillaEntity d = detalleMapper.toEntity(det);
-                        d.setPlanilla(entity); // 🔥 RELACIÓN CLAVE
+                        d.setPlanilla(entity); // 🔥 relación clave
                         return d;
                     })
                     .toList();

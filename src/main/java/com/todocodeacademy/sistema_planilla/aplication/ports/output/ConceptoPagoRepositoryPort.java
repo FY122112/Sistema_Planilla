@@ -16,14 +16,11 @@ public interface ConceptoPagoRepositoryPort {
 
     void deleteById(Long id);
 
-
     Optional<ConceptoPago> findByNombreConcepto(String nombreConcepto);
 
-    Optional<ConceptoPago> findByNombreConceptoAndTipo(String nombreConcepto, TipoConcepto tipo); // ADDED for controller
+    Optional<ConceptoPago> findByNombreConceptoAndTipo(String nombreConcepto, TipoConcepto tipo);
 
     List<ConceptoPago> findByTipo(TipoConcepto tipo);
 
-    List<ConceptoPago> findByAfectoOnpOrAfectoAfpOrAfectoEssalud(Boolean afectoOnp, Boolean afectoAfp, Boolean afectoEssalud);
-
-
+    List<ConceptoPago> findByAfectoEssalud(Boolean afectoEssalud);
 }

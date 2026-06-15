@@ -12,76 +12,53 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/permiso")
 public class PermissionController {
 
     private final PermissionServicePort perSer;
-
     private final PermissionMapper mapper;
 
     @GetMapping
-    public ResponseEntity<List<PermissionResponseDTO>> ListarPermisos() {
-
+    public ResponseEntity<List<PermissionResponseDTO>> listarPermisos() {
         List<PermissionResponseDTO> permisos = perSer.findAll()
-                                    .stream()
+                .stream()
                 .map(mapper::toResponse)
                 .toList();
-
         return ResponseEntity.ok(permisos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PermissionResponseDTO> BuscarPermisos(@PathVariable Long id) {
-
+    public ResponseEntity<PermissionResponseDTO> buscarPermisoPorId(@PathVariable Long id) {
         Permission permiso = perSer.findById(id);
-
-        PermissionResponseDTO permisoDTO = mapper.toResponse(permiso);
-
-        return ResponseEntity.ok(permisoDTO);
-
+        return ResponseEntity.ok(mapper.toResponse(permiso));
     }
 
     @PostMapping
-    public ResponseEntity<PermissionResponseDTO> crearPermisos(@RequestBody PermissionRequestDTO dto) {
-
+    public ResponseEntity<PermissionResponseDTO> crearPermiso(@Valid @RequestBody PermissionRequestDTO dto) {
         Permission permiso = mapper.toDomain(dto);
-
-        PermissionResponseDTO permisoDTO = mapper.toResponse(permiso);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(permisoDTO);
-
+        Permission saved = perSer.save(permiso); // ✅ Persistimos en BD
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PermissionResponseDTO> actualizarPermisos(@PathVariable Long id ,@Valid @RequestBody PermissionRequestDTO dto) {
-
+    public ResponseEntity<PermissionResponseDTO> actualizarPermiso(@PathVariable Long id,
+                                                                   @Valid @RequestBody PermissionRequestDTO dto) {
         Permission permiso = mapper.toDomain(dto);
-
-        Permission update = perSer.update(id,permiso);
-
-        PermissionResponseDTO permisoDTO = mapper.toResponse(update);
-
-        return ResponseEntity.ok(permisoDTO);
-
+        Permission update = perSer.update(id, permiso);
+        return ResponseEntity.ok(mapper.toResponse(update));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPermisos(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarPermiso(@PathVariable Long id) {
         perSer.deleteById(id);
-
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{nombre}")
-    public ResponseEntity<PermissionResponseDTO> buscarPermisos(@PathVariable String nombre) {
-
+    @GetMapping("/nombre/{nombre}") // ✅ Evitamos conflicto con @GetMapping("/{id}")
+    public ResponseEntity<PermissionResponseDTO> buscarPermisoPorNombre(@PathVariable String nombre) {
         Permission permiso = perSer.findByNombre(nombre);
-
-        PermissionResponseDTO permisoDTO = mapper.toResponse(permiso);
-
-        return ResponseEntity.ok(permisoDTO);
+        return ResponseEntity.ok(mapper.toResponse(permiso));
     }
 }

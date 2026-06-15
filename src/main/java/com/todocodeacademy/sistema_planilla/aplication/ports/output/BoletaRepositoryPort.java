@@ -2,6 +2,7 @@ package com.todocodeacademy.sistema_planilla.aplication.ports.output;
 
 import com.todocodeacademy.sistema_planilla.domain.model.Boleta;
 import com.todocodeacademy.sistema_planilla.domain.model.DetallePlanilla;
+import com.todocodeacademy.sistema_planilla.domain.model.Enum.EstadoBoleta;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface BoletaRepositoryPort {
 
     Optional<Boleta> findById(Long id);
 
-    Boleta save(Boleta banco);
+    Boleta save(Boleta boleta);
 
     void deleteById(Long id);
 
@@ -21,9 +22,6 @@ public interface BoletaRepositoryPort {
 
     List<Boleta> getBoletasByFechaEmisionBetween(LocalDate fechaInicio, LocalDate fechaFin);
 
-    List<Boleta> getBoletasByFirmadaStatus(Boolean firmada);
-
-    List<Boleta> getBoletasByEnviadaStatus(Boolean enviada);
-
+    List<Boleta> getBoletasByEstadoBoleta(EstadoBoleta estadoBoleta);
 
 }

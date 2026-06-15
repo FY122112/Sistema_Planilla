@@ -1,6 +1,9 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request;
+
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -16,4 +19,5 @@ public class CreateUsuarioRequest {
 
     private Long empresaId;
 
+    private Set<Long> roleIds;
 }

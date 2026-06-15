@@ -124,7 +124,7 @@ public class PuestoController {
 // 💰 BUSCAR POR SALARIO BASE
 // =========================
 
-    @GetMapping("/{salarioBase}")
+    @GetMapping("/salario/{salarioBase}")
     public ResponseEntity<?> findBySalarioBase(
             @PathVariable BigDecimal salarioBase
     ) {

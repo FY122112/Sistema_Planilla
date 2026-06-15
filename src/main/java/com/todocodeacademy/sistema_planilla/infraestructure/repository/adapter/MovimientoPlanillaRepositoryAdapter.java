@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.MovimientoPlanilla;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.MovimientoPlanillaEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaMovimientoPlanillaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class MovimientoPlanillaRepositoryAdapter implements MovimientoPlanillaRepositoryPort {
 

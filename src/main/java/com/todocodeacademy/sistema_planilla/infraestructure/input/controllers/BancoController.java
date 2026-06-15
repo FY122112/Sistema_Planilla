@@ -6,6 +6,7 @@ import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.Ba
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.BancoResponseDTO;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.BancoMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,27 +42,33 @@ public class BancoController {
     }
 
     @PostMapping
-    public ResponseEntity<BancoResponseDTO> guardarBanco(@RequestBody BancoRequestDTO requestDTO){
+    public ResponseEntity<BancoResponseDTO> guardarBanco(
+            @RequestBody BancoRequestDTO requestDTO
+    ){
 
         Banco bank = mapper.bancoDTO(requestDTO);
 
-        Banco save =  bankSer.save(bank);
+        Banco save = bankSer.save(bank);
 
-        BancoResponseDTO bankResponseDTO = mapper.bancoResponseDTO(save);
-
-        return ResponseEntity.ok(bankResponseDTO);
-
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        mapper.bancoResponseDTO(save)
+                );
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<BancoResponseDTO> actualizarBanco(@PathVariable Long id, @RequestBody BancoRequestDTO requestDTO){
+    @PutMapping("/{id}")
+    public ResponseEntity<BancoResponseDTO> actualizarBanco(
+            @PathVariable Long id,
+            @RequestBody BancoRequestDTO requestDTO
+    ){
 
         Banco bank = mapper.bancoDTO(requestDTO);
 
-        bankSer.update(bank.getIdBanco(),bank);
-        BancoResponseDTO bancoResponseDTO = mapper.bancoResponseDTO(bank);
+        Banco actualizado = bankSer.update(id, bank);
 
-        return ResponseEntity.ok(bancoResponseDTO);
+        return ResponseEntity.ok(
+                mapper.bancoResponseDTO(actualizado)
+        );
     }
 
     @DeleteMapping("/{id}")

@@ -2,72 +2,63 @@ package com.todocodeacademy.sistema_planilla.infraestructure.input.controllers;
 
 
 import com.todocodeacademy.sistema_planilla.aplication.ports.input.EmpleadoServicePort;
+import com.todocodeacademy.sistema_planilla.domain.model.Empleado;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.EmpleadoMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.CreateEmpleadoRequest;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.UpdateEmpleadoRequest;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.EmpleadoResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/empleados")
 @RequiredArgsConstructor
 public class EmpleadoController {
 
     private final EmpleadoServicePort empleadoService;
-
     private final EmpleadoMapper mapper;
 
-    // ==========================================
-    // LISTAR TODOS
-    // ==========================================
-
     @GetMapping
-    public List<EmpleadoResponse> findAll() {
+    public ResponseEntity<List<EmpleadoResponse>> findAll() {
 
-        return empleadoService.findAll()
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
-    }
-
-    // ==========================================
-    // BUSCAR POR ID
-    // ==========================================
-
-    @GetMapping("/{id}")
-    public EmpleadoResponse findById(
-            @PathVariable Long id
-    ) {
-
-        return mapper.toResponse(
-                empleadoService.findById(id)
+        return ResponseEntity.ok(
+                empleadoService.findAll()
+                        .stream()
+                        .map(mapper::toResponse)
+                        .toList()
         );
     }
 
-    // ==========================================
-    // CREAR
-    // ==========================================
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public EmpleadoResponse save(
-            @RequestBody CreateEmpleadoRequest request
+    @GetMapping("/{id}")
+    public ResponseEntity<EmpleadoResponse> findById(
+            @PathVariable Long id
     ) {
 
-        return mapper.toResponse(
-                empleadoService.save(
-                        mapper.toDomain(request)
+        return ResponseEntity.ok(
+                mapper.toResponse(
+                        empleadoService.findById(id)
                 )
         );
     }
 
-    // ==========================================
-    // ACTUALIZAR
-    // ==========================================
+    @PostMapping
+    public ResponseEntity<EmpleadoResponse> save(
+            @Valid @RequestBody CreateEmpleadoRequest request
+    ) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        mapper.toResponse(
+                                empleadoService.save(
+                                        mapper.toDomain(request)
+                                )
+                        )
+                );
+    }
 
     @PutMapping("/{id}")
     public EmpleadoResponse update(
@@ -75,71 +66,64 @@ public class EmpleadoController {
             @RequestBody UpdateEmpleadoRequest request
     ) {
 
+        Empleado actual = empleadoService.findById(id);
+
+        Empleado actualizado =
+                mapper.updateDomain(request, actual);
+
         return mapper.toResponse(
-                empleadoService.update(
-                        id,
-                        mapper.toDomain(request)
-                )
+                empleadoService.update(id, actualizado)
         );
     }
 
-    // ==========================================
-    // ELIMINAR
-    // ==========================================
-
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(
+    public ResponseEntity<Void> delete(
             @PathVariable Long id
     ) {
 
         empleadoService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
-    // ==========================================
-    // EMPLEADOS ACTIVOS / INACTIVOS
-    // ==========================================
-
     @GetMapping("/estado/{estado}")
-    public List<EmpleadoResponse> findByEstado(
+    public ResponseEntity<List<EmpleadoResponse>> findByEstado(
             @PathVariable Boolean estado
     ) {
 
-        return empleadoService.findByEstado(estado)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        return ResponseEntity.ok(
+                empleadoService.findByEstado(estado)
+                        .stream()
+                        .map(mapper::toResponse)
+                        .toList()
+        );
     }
 
-    // ==========================================
-    // HIJOS CALIFICADOS
-    // ==========================================
-
     @GetMapping("/hijos/{tieneHijos}")
-    public List<EmpleadoResponse> findByTieneHijosCalificados(
+    public ResponseEntity<List<EmpleadoResponse>> findByTieneHijosCalificados(
             @PathVariable Boolean tieneHijos
     ) {
 
-        return empleadoService
-                .findByTieneHijosCalificados(tieneHijos)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        return ResponseEntity.ok(
+                empleadoService
+                        .findByTieneHijosCalificados(tieneHijos)
+                        .stream()
+                        .map(mapper::toResponse)
+                        .toList()
+        );
     }
 
-    // ==========================================
-    // BUSQUEDA GENERAL
-    // ==========================================
-
     @GetMapping("/search")
-    public List<EmpleadoResponse> search(
+    public ResponseEntity<List<EmpleadoResponse>> search(
             @RequestParam String query
     ) {
 
-        return empleadoService
-                .searchByDniOrNameOrLastName(query)
-                .stream()
-                .map(mapper::toResponse)
-                .toList();
+        return ResponseEntity.ok(
+                empleadoService
+                        .searchByDniOrNameOrLastName(query)
+                        .stream()
+                        .map(mapper::toResponse)
+                        .toList()
+        );
     }
 }

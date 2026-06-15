@@ -6,10 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface JpaUsuarioRepository extends JpaRepository<UsuarioSecEntity,Long> {
+public interface JpaUsuarioRepository extends JpaRepository<UsuarioSecEntity, Long> {
 
-    Optional<UsuarioSecEntity> findByNombre(String nombre);
+    Optional<UsuarioSecEntity> findByUsername(String username);
 
     Optional<UsuarioSecEntity> findByEmail(String email);
-
 }
+

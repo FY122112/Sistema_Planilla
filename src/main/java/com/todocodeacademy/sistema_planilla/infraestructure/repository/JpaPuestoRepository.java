@@ -9,8 +9,7 @@ import java.util.Optional;
 
 public interface JpaPuestoRepository extends JpaRepository<PuestoEntity, Long> {
 
-    Optional<PuestoEntity> findByNombrePuesto(String nombrePuesto);
-
+    Optional<PuestoEntity> findByNombre(String nombre);
     /**
      * Busca todos los puestos con un salario base mayor o igual al valor especificado.
      * @param salarioBase El salario base mínimo.

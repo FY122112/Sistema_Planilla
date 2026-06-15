@@ -5,10 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.UsuarioSec;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.UsuarioSecEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaUsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class UsuarioRepositoryAdapter implements UsuarioSecRepositoryPort {
 
@@ -41,7 +43,7 @@ public class UsuarioRepositoryAdapter implements UsuarioSecRepositoryPort {
 
     @Override
     public Optional<UsuarioSec> findByUsername(String nombre) {
-        return repository.findByNombre(nombre).map(mapper::toDomain);
+        return repository.findByUsername(nombre).map(mapper::toDomain);
 
     }
 

@@ -1,10 +1,7 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.mapper;
 
 import com.todocodeacademy.sistema_planilla.domain.model.Empleado;
-import com.todocodeacademy.sistema_planilla.infraestructure.entity.BancoEntity;
 import com.todocodeacademy.sistema_planilla.infraestructure.entity.EmpleadoEntity;
-import com.todocodeacademy.sistema_planilla.infraestructure.entity.PuestoEntity;
-import com.todocodeacademy.sistema_planilla.infraestructure.entity.SistemaPensionEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -44,11 +41,22 @@ public class EmpleadoEntMapper {
                 entity.getFechaIngreso(),
                 entity.isEstado(),
                 entity.getFechaCese(),
-                mapperPuesto.toDomain(entity.getPuesto()),
+
+                entity.getPuesto() != null
+                        ? mapperPuesto.toDomain(entity.getPuesto())
+                        : null,
+
                 entity.getRegimenLaboral(),
                 entity.isTieneHijosCalificados(),
-                mapperSistema.toDomain(entity.getSistemaPension()),
-                mapperBanco.toDomain(entity.getBanco()),
+
+                entity.getSistemaPension() != null
+                        ? mapperSistema.toDomain(entity.getSistemaPension())
+                        : null,
+
+                entity.getBanco() != null
+                        ? mapperBanco.toDomain(entity.getBanco())
+                        : null,
+
                 entity.getCodigoPension(),
                 entity.getNombreAfp(),
                 entity.getNumeroCuentaBanco(),
@@ -70,7 +78,6 @@ public class EmpleadoEntMapper {
         EmpleadoEntity entity = new EmpleadoEntity();
 
         entity.setIdEmpleado(domain.getIdEmpleado());
-
         entity.setNombre(domain.getNombre());
         entity.setApellido(domain.getApellido());
 
@@ -93,73 +100,37 @@ public class EmpleadoEntMapper {
         entity.setEstado(domain.estaActivo());
         entity.setFechaCese(domain.getFechaCese());
 
-        // ==========================================
-        // PUESTO
-        // ==========================================
-
+        // MAPEAR COMPLETO
         if (domain.getPuesto() != null) {
-
-            PuestoEntity puesto = new PuestoEntity();
-            puesto.setIdPuesto(domain.getPuesto().getIdPuesto());
-
-            entity.setPuesto(puesto);
+            entity.setPuesto(
+                    mapperPuesto.toEntity(domain.getPuesto())
+            );
         }
-
-        // ==========================================
-        // REGIMEN LABORAL
-        // ==========================================
 
         entity.setRegimenLaboral(domain.getRegimenLaboral());
         entity.setTieneHijosCalificados(
                 domain.isTieneHijosCalificados()
         );
 
-        // ==========================================
-        // SISTEMA PENSION
-        // ==========================================
-
         if (domain.getSistemaPension() != null) {
-
-            SistemaPensionEntity sistema =
-                    new SistemaPensionEntity();
-
-            sistema.setIdSistema(
-                    domain.getSistemaPension().getIdSistema()
+            entity.setSistemaPension(
+                    mapperSistema.toEntity(
+                            domain.getSistemaPension()
+                    )
             );
-
-            entity.setSistemaPension(sistema);
         }
-
-        // ==========================================
-        // BANCO
-        // ==========================================
 
         if (domain.getBanco() != null) {
-
-            BancoEntity banco = new BancoEntity();
-
-            banco.setIdBanco(
-                    domain.getBanco().getIdBanco()
+            entity.setBanco(
+                    mapperBanco.toEntity(
+                            domain.getBanco()
+                    )
             );
-
-            entity.setBanco(banco);
         }
 
-        // ==========================================
-        // DATOS FINANCIEROS
-        // ==========================================
-
-        entity.setCodigoPension(
-                domain.getCodigoPension()
-        );
-
-        entity.setNombreAfp(
-                domain.getNombreAfp()
-        );
-
-        entity.setNumeroCuentaBanco(
-                domain.getNumeroCuentaBanco()
-        );
+        entity.setCodigoPension(domain.getCodigoPension());
+        entity.setNombreAfp(domain.getNombreAfp());
+        entity.setNumeroCuentaBanco(domain.getNumeroCuentaBanco());
 
         return entity;
     }

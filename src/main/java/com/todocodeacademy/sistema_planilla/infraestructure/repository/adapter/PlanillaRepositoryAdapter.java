@@ -6,11 +6,13 @@ import com.todocodeacademy.sistema_planilla.domain.model.Planilla;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.PlanillaEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaPlanillaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class PlanillaRepositoryAdapter implements PlanillaRepositoryPort {
 

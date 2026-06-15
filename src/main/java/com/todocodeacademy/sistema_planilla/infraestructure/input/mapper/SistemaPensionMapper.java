@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SistemaPensionMapper {
 
-    // REQUEST -> ENTITY
-    public static SistemaPension toEntity(
+    public SistemaPension toEntity(
             SistemaPensionRequestDTO dto
     ) {
-
         return new SistemaPension(
                 dto.getNombre(),
                 dto.getTipo(),
@@ -21,11 +19,9 @@ public class SistemaPensionMapper {
         );
     }
 
-    // ENTITY -> RESPONSE
-    public static SistemaPensionResponseDTO toResponseDTO(
+    public SistemaPensionResponseDTO toResponseDTO(
             SistemaPension entity
     ) {
-
         return new SistemaPensionResponseDTO(
                 entity.getIdSistema(),
                 entity.getNombre(),

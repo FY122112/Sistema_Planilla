@@ -5,11 +5,12 @@ import com.todocodeacademy.sistema_planilla.domain.model.Permission;
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.PermissionEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaPermisoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Repository
 @RequiredArgsConstructor
 public class PermissionRepositoryAdapter implements PermissionRepositoryPort {
 

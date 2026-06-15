@@ -6,11 +6,14 @@ import com.todocodeacademy.sistema_planilla.infraestructure.entity.ParametroLega
 import com.todocodeacademy.sistema_planilla.infraestructure.mapper.ParametroLegalEntMapper;
 import com.todocodeacademy.sistema_planilla.infraestructure.repository.JpaParametroLegalRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
+@Repository
 @RequiredArgsConstructor
 public class ParametroLegalAdapter implements ParametroLegalRepositoryPort {
 

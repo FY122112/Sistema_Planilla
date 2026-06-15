@@ -44,7 +44,14 @@ public class EmpleadoRepositoryAdapter implements EmpleadoRepositoryPort {
 
         var savedEntity = repository.save(entity);
 
-        return mapper.toDomain(savedEntity);
+        // volver a consultar ya persistido completamente
+        var empleadoCompleto = repository.findById(
+                savedEntity.getIdEmpleado()
+        ).orElseThrow(() ->
+                new RuntimeException("Error al recuperar empleado")
+        );
+
+        return mapper.toDomain(empleadoCompleto);
     }
 
     @Override
