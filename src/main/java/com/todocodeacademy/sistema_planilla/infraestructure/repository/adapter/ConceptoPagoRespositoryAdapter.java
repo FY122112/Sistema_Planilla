@@ -13,26 +13,33 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class ConceptoPagoRespositoryAdapter implements ConceptoPagoRepositoryPort {
+public class ConceptoPagoRespositoryAdapter
+        implements ConceptoPagoRepositoryPort {
 
     private final JpaConceptoPagoRepository repository;
     private final ConceptoPagoEntMapper mapper;
 
     @Override
     public List<ConceptoPago> findAll() {
-        return repository.findAll().stream()
+        return repository.findAll()
+                .stream()
                 .map(mapper::toDomain)
                 .toList();
     }
 
     @Override
     public Optional<ConceptoPago> findById(Long id) {
-        return repository.findById(id).map(mapper::toDomain);
+        return repository.findById(id)
+                .map(mapper::toDomain);
     }
 
     @Override
-    public ConceptoPago save(ConceptoPago banco) {
-        return mapper.toDomain(repository.save(mapper.toEntity(banco)));
+    public ConceptoPago save(ConceptoPago concepto) {
+        return mapper.toDomain(
+                repository.save(
+                        mapper.toEntity(concepto)
+                )
+        );
     }
 
     @Override
@@ -41,38 +48,46 @@ public class ConceptoPagoRespositoryAdapter implements ConceptoPagoRepositoryPor
     }
 
     @Override
-    public Optional<ConceptoPago> findByNombreConcepto(String nombreConcepto) {
-        return repository.findByNombreConcepto(nombreConcepto).map(mapper::toDomain);
-    }
-
-    @Override
-    public Optional<ConceptoPago> findByNombreConceptoAndTipo(String nombreConcepto, TipoConcepto tipo) {
-        return repository.findByNombreConceptoAndTipoConcepto(nombreConcepto, tipo.name())
+    public Optional<ConceptoPago> findByNombreConcepto(
+            String nombreConcepto
+    ) {
+        return repository
+                .findByNombreConcepto(nombreConcepto)
                 .map(mapper::toDomain);
     }
 
     @Override
-    public List<ConceptoPago> findByTipo(TipoConcepto tipo) {
-        return repository.findByTipoConcepto(tipo.name())
+    public Optional<ConceptoPago> findByNombreConceptoAndTipo(
+            String nombreConcepto,
+            TipoConcepto tipo
+    ) {
+        return repository
+                .findByNombreConceptoAndTipoConcepto(
+                        nombreConcepto,
+                        tipo
+                )
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<ConceptoPago> findByTipo(
+            TipoConcepto tipo
+    ) {
+        return repository
+                .findByTipoConcepto(tipo)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();
     }
 
     @Override
-    public List<ConceptoPago> findByAfectoEssalud(Boolean afectoEssalud) {
-        return repository.findByAfectoEssalud(afectoEssalud)
+    public List<ConceptoPago> findByAfectoEssalud(
+            Boolean afectoEssalud
+    ) {
+        return repository
+                .findByAfectoEssalud(afectoEssalud)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();
     }
-
-
-    /*@Override
-    public List<ConceptoPago> findByAfectoEssalud(Boolean afectoEssalud) {
-        return repository.findByAfectoEssalud(afectoEssalud)
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
-    }*/
 }

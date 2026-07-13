@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ConceptoPagoEntMapper {
 
-    // =========================
-    // ENTITY → DOMAIN
-    // =========================
     public ConceptoPago toDomain(ConceptoPagoEntity entity) {
 
         if (entity == null) return null;
@@ -30,9 +27,6 @@ public class ConceptoPagoEntMapper {
         );
     }
 
-    // =========================
-    // DOMAIN → ENTITY
-    // =========================
     public ConceptoPagoEntity toEntity(ConceptoPago domain) {
 
         if (domain == null) return null;
@@ -43,16 +37,12 @@ public class ConceptoPagoEntMapper {
         entity.setCodigoSunat(domain.getCodigoSunat());
         entity.setNombreConcepto(domain.getNombreConcepto());
         entity.setTipoConcepto(domain.getTipoConcepto());
-        entity.setMetodoCalculado(domain.getMetodoCalculo()); // 👈 ojo naming
+        entity.setMetodoCalculado(domain.getMetodoCalculado());
         entity.setEsRemunerativo(domain.isEsRemunerativo());
         entity.setValorReferencial(domain.getValorReferencial());
         entity.setTipoSistemaPensiones(domain.getTipoSistemaPensiones());
         entity.setAfectoEssalud(domain.isAfectoEssalud());
         entity.setDescripcion(domain.getDescripcion());
-
-        // ❗ no mapear auditoría manualmente
-        // entity.setCreatedAt(...)
-        // entity.setUpdatedAt(...)
 
         return entity;
     }

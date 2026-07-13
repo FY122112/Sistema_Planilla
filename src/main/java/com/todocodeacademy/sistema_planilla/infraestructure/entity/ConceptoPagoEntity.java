@@ -5,7 +5,6 @@ import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoConcepto;
 import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoSistemaPensiones;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -30,11 +29,13 @@ public class ConceptoPagoEntity {
     @Column(nullable = false)
     private String nombreConcepto;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipoConcepto;
+    private TipoConcepto tipoConcepto;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String metodoCalculado;
+    private MetodoCalculado metodoCalculado;
 
     @Column(nullable = false)
     private boolean esRemunerativo;
@@ -42,7 +43,8 @@ public class ConceptoPagoEntity {
     @Column(precision = 10, scale = 2)
     private BigDecimal valorReferencial;
 
-    private String tipoSistemaPensiones;
+    @Enumerated(EnumType.STRING)
+    private TipoSistemaPensiones tipoSistemaPensiones;
 
     @Column(nullable = false)
     private boolean afectoEssalud;

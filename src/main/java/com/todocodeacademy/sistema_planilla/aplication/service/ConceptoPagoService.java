@@ -3,6 +3,7 @@ package com.todocodeacademy.sistema_planilla.aplication.service;
 import com.todocodeacademy.sistema_planilla.aplication.ports.input.ConceptoPagoServicePort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ConceptoPagoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.domain.model.ConceptoPago;
+import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoConcepto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,6 @@ public class ConceptoPagoService implements ConceptoPagoServicePort {
 
     private final ConceptoPagoRepositoryPort conRepo;
 
-
     @Override
     public List<ConceptoPago> findAll() {
         return conRepo.findAll();
@@ -22,10 +22,10 @@ public class ConceptoPagoService implements ConceptoPagoServicePort {
 
     @Override
     public ConceptoPago findById(Long id) {
-        ConceptoPago concepto = conRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("Concepto no encontrado"));
 
-        return concepto;
-
+        return conRepo.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Concepto no encontrado"));
     }
 
     @Override
@@ -35,36 +35,75 @@ public class ConceptoPagoService implements ConceptoPagoServicePort {
 
     @Override
     public ConceptoPago update(Long id, ConceptoPago conceptoPago) {
-        ConceptoPago concepto = conRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("Concepto no encontrado"));
 
+        ConceptoPago concepto = conRepo.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Concepto no encontrado"));
 
+        if (conceptoPago.getNombreConcepto() != null) {
+            concepto.actualizarNombre(conceptoPago.getNombreConcepto());
+        }
 
-            if (conceptoPago.getNombreConcepto() != null) {
+        if (conceptoPago.getValorReferencial() != null) {
+            concepto.actualizarValorReferencial(
+                    conceptoPago.getValorReferencial()
+            );
+        }
 
-                concepto.actualizarNombre(conceptoPago.getNombreConcepto());
-            }
-            if (conceptoPago.getValorReferencial() != null) {
+        if (conceptoPago.getDescripcion() != null) {
+            concepto.actualizarDescripcion(
+                    conceptoPago.getDescripcion()
+            );
+        }
 
-                concepto.actualizarValorReferencial(conceptoPago.getValorReferencial());
-            }
-
-
-        ConceptoPago actualizado = conRepo.save(concepto);
-
-        return actualizado;
-
+        return conRepo.save(concepto);
     }
 
     @Override
     public void deleteById(Long id) {
 
-        conRepo.findById(id).orElseThrow(()-> new IllegalArgumentException("Concepto no encontrado"));
+        conRepo.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Concepto no encontrado"));
 
         conRepo.deleteById(id);
-
     }
 
+    // ===============================
+    // NUEVOS MÉTODOS
+    // ===============================
 
+    @Override
+    public ConceptoPago findByNombreConcepto(String nombreConcepto) {
 
+        return conRepo.findByNombreConcepto(nombreConcepto)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Concepto no encontrado"));
+    }
 
+    @Override
+    public ConceptoPago findByNombreConceptoAndTipo(
+            String nombreConcepto,
+            TipoConcepto tipo
+    ) {
+
+        return conRepo.findByNombreConceptoAndTipo(
+                        nombreConcepto,
+                        tipo
+                )
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Concepto no encontrado"));
+    }
+
+    @Override
+    public List<ConceptoPago> findByTipo(TipoConcepto tipo) {
+        return conRepo.findByTipo(tipo);
+    }
+
+    @Override
+    public List<ConceptoPago> findByAfectoEssalud(
+            Boolean afectoEssalud
+    ) {
+        return conRepo.findByAfectoEssalud(afectoEssalud);
+    }
 }

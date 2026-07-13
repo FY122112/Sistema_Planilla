@@ -7,25 +7,23 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface JpaConceptoPagoRepository extends JpaRepository<ConceptoPagoEntity, Long> {
+public interface JpaConceptoPagoRepository
+        extends JpaRepository<ConceptoPagoEntity, Long> {
 
-    /**
-     * Busca un concepto de pago por su nombre.
-     */
-    Optional<ConceptoPagoEntity> findByNombreConcepto(String nombreConcepto);
+    Optional<ConceptoPagoEntity> findByNombreConcepto(
+            String nombreConcepto
+    );
 
-    /**
-     * Busca un concepto de pago por su nombre y tipo.
-     */
-    Optional<ConceptoPagoEntity> findByNombreConceptoAndTipoConcepto(String nombreConcepto, String tipoConcepto);
+    Optional<ConceptoPagoEntity> findByNombreConceptoAndTipoConcepto(
+            String nombreConcepto,
+            TipoConcepto tipoConcepto
+    );
 
-    /**
-     * Busca todos los conceptos de pago de un tipo específico.
-     */
-    List<ConceptoPagoEntity> findByTipoConcepto(String tipoConcepto);
+    List<ConceptoPagoEntity> findByTipoConcepto(
+            TipoConcepto tipoConcepto
+    );
 
-    /**
-     * Busca conceptos de pago que sean afectos a EsSalud.
-     */
-    List<ConceptoPagoEntity> findByAfectoEssalud(Boolean afectoEssalud);
+    List<ConceptoPagoEntity> findByAfectoEssalud(
+            Boolean afectoEssalud
+    );
 }

@@ -4,6 +4,7 @@ import com.todocodeacademy.sistema_planilla.infraestructure.entity.RoleEntity;
 import com.todocodeacademy.sistema_planilla.infraestructure.entity.UsuarioSecEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface JpaUsuarioRepository extends JpaRepository<UsuarioSecEntity, Long> {
@@ -11,5 +12,12 @@ public interface JpaUsuarioRepository extends JpaRepository<UsuarioSecEntity, Lo
     Optional<UsuarioSecEntity> findByUsername(String username);
 
     Optional<UsuarioSecEntity> findByEmail(String email);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    List<UsuarioSecEntity> findByEnabledTrue();
+
 }
 

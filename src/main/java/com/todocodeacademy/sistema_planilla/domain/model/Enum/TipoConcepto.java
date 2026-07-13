@@ -1,18 +1,26 @@
 package com.todocodeacademy.sistema_planilla.domain.model.Enum;
 
 public enum TipoConcepto {
-
     INGRESO("Ingreso"),
     DESCUENTO("Descuento"),
-    APORTE_EMPLEADOR("Aporte Empleador"); // <-- Aquí se añaden los nombres a mostrar
+    APORTE_EMPLEADOR("Aporte Empleador");
 
-    private final String displayName; // <-- Nueva propiedad
+    private final String displayName;
 
-    TipoConcepto(String displayName) { // <-- Nuevo constructor
+    TipoConcepto(String displayName) {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() { // <-- Nuevo método getter
+    public String getDisplayName() {
         return displayName;
+    }
+
+    public static TipoConcepto fromDisplayName(String displayName) {
+        for (TipoConcepto tc : values()) {
+            if (tc.displayName.equalsIgnoreCase(displayName)) {
+                return tc;
+            }
+        }
+        throw new IllegalArgumentException("TipoConcepto inválido: " + displayName);
     }
 }

@@ -124,6 +124,10 @@ public class UsuarioSec {
     // ACTUALIZACIONES
     // =========================================
 
+    public void asignarContraseña(String password) {
+        this.password = password;
+    }
+
     public void actualizarUsername(String username) {
 
         if (username == null || username.isBlank()) {

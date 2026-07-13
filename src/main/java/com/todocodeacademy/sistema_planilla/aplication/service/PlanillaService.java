@@ -5,6 +5,8 @@ import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpleadoRepo
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ParametroLegalRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.PlanillaRepositoryPort;
 import com.todocodeacademy.sistema_planilla.domain.model.*;
+import com.todocodeacademy.sistema_planilla.domain.model.Enum.MetodoCalculado;
+import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoConcepto;
 import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoPlanilla;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -252,8 +254,8 @@ public class PlanillaService implements PlanillaServicePort {
                         new ConceptoPago(
                                 "AFP_ONP",
                                 "Descuento Pensionario",
-                                "DESCUENTO",
-                                "PORCENTAJE",
+                                TipoConcepto.fromDisplayName("Descuento"),     // ✅ enum correcto
+                                MetodoCalculado.fromDisplayName("Porcentaje"), // ✅ enum correcto
                                 false
                         );
 
