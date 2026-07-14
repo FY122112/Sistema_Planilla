@@ -42,10 +42,10 @@ public class SecurityConfig {
                         org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/banco/**").permitAll() // login y registro sin token
-                        .requestMatchers("/api/usuarios/**").permitAll() // 👈 acceso libre para crear usuarios
-                        .requestMatchers("/api/roles/**").permitAll() // 👈 acceso libre para crear usuarios
-                        .requestMatchers("/auth/login/**").permitAll() // 👈 acceso libre para crear usuarios
+                        // Único endpoint público: sin esto nadie podría obtener un token para
+                        // autenticarse. Antes /api/banco, /api/usuarios y /api/roles también
+                        // estaban abiertos sin token; cualquiera podía crear usuarios o roles.
+                        .requestMatchers("/auth/login/**").permitAll()
                         .anyRequest().authenticated() // todo lo demás requiere token
                 )
                 .build();
