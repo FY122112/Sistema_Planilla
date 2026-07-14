@@ -1,9 +1,18 @@
+// Todos los tipos que existen en el backend (Enum.TipoPlanilla), usado para mostrar
+// el nombre de una planilla ya generada, sea cual sea su tipo.
 export const TIPO_PLANILLA_OPTIONS = [
   { value: 'MENSUAL', label: 'Mensual' },
   { value: 'CTS', label: 'CTS' },
   { value: 'GRATIFICACION', label: 'Gratificación' },
   { value: 'LIQUIDACION', label: 'Liquidación' },
 ];
+
+// Tipos que realmente se pueden generar desde el formulario: LIQUIDACION se calcula
+// para un empleado específico en su cese, no de forma masiva mensual, y el backend
+// todavía no lo soporta (devuelve 501 Not Implemented si se intenta).
+export const TIPO_PLANILLA_GENERABLE_OPTIONS = TIPO_PLANILLA_OPTIONS.filter(
+  (t) => t.value !== 'LIQUIDACION',
+);
 
 export const MESES = [
   { value: '1', label: 'Enero' },

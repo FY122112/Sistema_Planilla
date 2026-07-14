@@ -55,6 +55,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.FORBIDDEN, ex.getMessage(), request, null);
     }
 
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedOperation(UnsupportedOperationException ex, HttpServletRequest request) {
+        return build(HttpStatus.NOT_IMPLEMENTED, ex.getMessage(), request, null);
+    }
+
     // Varios servicios (Planilla, Asistencia, ControlVacacional, etc.) lanzan RuntimeException
     // "en crudo" para casos de "no encontrado". Se trata como 404 por convención del proyecto.
     @ExceptionHandler(RuntimeException.class)

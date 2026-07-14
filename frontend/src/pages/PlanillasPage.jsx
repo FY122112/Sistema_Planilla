@@ -30,7 +30,12 @@ import {
   fetchPlanillas,
   generarPlanilla,
 } from '../api/planillas';
-import { MESES, TIPO_PLANILLA_OPTIONS, nombreMes, nombreTipoPlanilla } from '../constants/planilla';
+import {
+  MESES,
+  TIPO_PLANILLA_GENERABLE_OPTIONS,
+  nombreMes,
+  nombreTipoPlanilla,
+} from '../constants/planilla';
 import ConfirmModal from '../components/ConfirmModal';
 
 export default function PlanillasPage() {
@@ -230,7 +235,8 @@ export default function PlanillasPage() {
           />
           <Select
             label="Tipo de planilla"
-            data={TIPO_PLANILLA_OPTIONS}
+            description="CTS solo se genera en mayo o noviembre. Gratificación, en julio o diciembre."
+            data={TIPO_PLANILLA_GENERABLE_OPTIONS}
             required
             mt="sm"
             {...form.getInputProps('tipoPlanilla')}
