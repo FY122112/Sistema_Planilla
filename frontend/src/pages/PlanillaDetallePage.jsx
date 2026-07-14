@@ -12,13 +12,14 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconArrowLeft, IconLock, IconLockOpen, IconTrash } from '@tabler/icons-react';
+import { IconArrowLeft, IconFileText, IconLock, IconLockOpen, IconTrash } from '@tabler/icons-react';
 import {
   abrirPlanilla,
   cerrarPlanilla,
   deletePlanilla,
   fetchPlanillaById,
 } from '../api/planillas';
+import { createBoleta, fetchBoletas } from '../api/boletas';
 import { formatearMoneda, nombreMes, nombreTipoPlanilla } from '../constants/planilla';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -26,15 +27,28 @@ export default function PlanillaDetallePage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [planilla, setPlanilla] = useState(null);
+  // idDetalle -> idBoleta, para saber en qué filas ya existe boleta generada
+  const [boletasPorDetalle, setBoletasPorDetalle] = useState({});
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(false);
+  const [generandoBoletaId, setGenerandoBoletaId] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const loadData = () => {
     setLoading(true);
-    return fetchPlanillaById(id)
-      .then(setPlanilla)
+    return Promise.all([fetchPlanillaById(id), fetchBoletas()])
+      .then(([planillaData, boletas]) => {
+        setPlanilla(planillaData);
+
+        const mapa = {};
+        boletas
+          .filter((b) => planillaData.detalles.some((d) => d.idDetalle === b.idDetalle))
+          .forEach((b) => {
+            mapa[b.idDetalle] = b.idBoleta;
+          });
+        setBoletasPorDetalle(mapa);
+      })
       .catch(() => {
         notifications.show({
           color: 'red',
@@ -44,6 +58,28 @@ export default function PlanillaDetallePage() {
         navigate('/planillas');
       })
       .finally(() => setLoading(false));
+  };
+
+  const handleGenerarBoleta = async (detalle) => {
+    setGenerandoBoletaId(detalle.idDetalle);
+    try {
+      const boleta = await createBoleta({
+        idDetalle: detalle.idDetalle,
+        fechaEmision: new Date().toISOString().slice(0, 10),
+        periodoMes: planilla.mes,
+        periodoAnio: planilla.anio,
+        sueldoBruto: detalle.sueldoBruto,
+        totalDescuento: detalle.totalDescuento,
+      });
+
+      notifications.show({ color: 'green', title: 'Boleta generada', message: '' });
+      navigate(`/boletas/${boleta.idBoleta}`);
+    } catch (error) {
+      const message = error.response?.data?.message || 'No se pudo generar la boleta';
+      notifications.show({ color: 'red', title: 'Error', message });
+    } finally {
+      setGenerandoBoletaId(null);
+    }
   };
 
   useEffect(() => {
@@ -178,23 +214,48 @@ export default function PlanillaDetallePage() {
             <Table.Th ta="right">Bruto</Table.Th>
             <Table.Th ta="right">Descuentos</Table.Th>
             <Table.Th ta="right">Neto</Table.Th>
+            <Table.Th ta="right">Boleta</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {planilla.detalles.map((detalle) => (
-            <Table.Tr key={detalle.idDetalle}>
-              <Table.Td>{detalle.empleado}</Table.Td>
-              <Table.Td ta="right">{formatearMoneda(detalle.sueldoBase)}</Table.Td>
-              <Table.Td ta="right">{formatearMoneda(detalle.asignacionFamiliar)}</Table.Td>
-              <Table.Td ta="right">{formatearMoneda(detalle.sueldoBruto)}</Table.Td>
-              <Table.Td ta="right" c="red">
-                -{formatearMoneda(detalle.totalDescuento)}
-              </Table.Td>
-              <Table.Td ta="right" fw={700}>
-                {formatearMoneda(detalle.sueldoNeto)}
-              </Table.Td>
-            </Table.Tr>
-          ))}
+          {planilla.detalles.map((detalle) => {
+            const idBoletaExistente = boletasPorDetalle[detalle.idDetalle];
+            return (
+              <Table.Tr key={detalle.idDetalle}>
+                <Table.Td>{detalle.empleado}</Table.Td>
+                <Table.Td ta="right">{formatearMoneda(detalle.sueldoBase)}</Table.Td>
+                <Table.Td ta="right">{formatearMoneda(detalle.asignacionFamiliar)}</Table.Td>
+                <Table.Td ta="right">{formatearMoneda(detalle.sueldoBruto)}</Table.Td>
+                <Table.Td ta="right" c="red">
+                  -{formatearMoneda(detalle.totalDescuento)}
+                </Table.Td>
+                <Table.Td ta="right" fw={700}>
+                  {formatearMoneda(detalle.sueldoNeto)}
+                </Table.Td>
+                <Table.Td ta="right">
+                  {idBoletaExistente ? (
+                    <Button
+                      size="xs"
+                      variant="light"
+                      leftSection={<IconFileText size={14} />}
+                      onClick={() => navigate(`/boletas/${idBoletaExistente}`)}
+                    >
+                      Ver boleta
+                    </Button>
+                  ) : (
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      loading={generandoBoletaId === detalle.idDetalle}
+                      onClick={() => handleGenerarBoleta(detalle)}
+                    >
+                      Generar boleta
+                    </Button>
+                  )}
+                </Table.Td>
+              </Table.Tr>
+            );
+          })}
         </Table.Tbody>
         <Table.Tfoot>
           <Table.Tr>
@@ -206,6 +267,7 @@ export default function PlanillaDetallePage() {
               -{formatearMoneda(totales.totalDescuento)}
             </Table.Th>
             <Table.Th ta="right">{formatearMoneda(totales.sueldoNeto)}</Table.Th>
+            <Table.Th></Table.Th>
           </Table.Tr>
         </Table.Tfoot>
       </Table>

@@ -9,3 +9,31 @@ body {
 #root {
   min-height: 100svh;
 }
+
+@media print {
+  .mantine-AppShell-header,
+  .mantine-AppShell-navbar,
+  .no-print {
+    display: none !important;
+  }
+
+  .mantine-AppShell-main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #boleta-imprimible,
+  #boleta-imprimible * {
+    visibility: visible;
+  }
+
+  #boleta-imprimible {
+    position: absolute;
+    inset: 0;
+    border: none !important;
+  }
+}

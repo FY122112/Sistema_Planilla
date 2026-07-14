@@ -7,6 +7,8 @@ import EmpleadosPage from './pages/EmpleadosPage';
 import UsuariosPage from './pages/UsuariosPage';
 import PlanillasPage from './pages/PlanillasPage';
 import PlanillaDetallePage from './pages/PlanillaDetallePage';
+import BoletasPage from './pages/BoletasPage';
+import BoletaDetallePage from './pages/BoletaDetallePage';
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
             <Route path="/usuarios" element={<UsuariosPage />} />
             <Route path="/planillas" element={<PlanillasPage />} />
             <Route path="/planillas/:id" element={<PlanillaDetallePage />} />
+            <Route path="/boletas" element={<BoletasPage />} />
+            <Route path="/boletas/:id" element={<BoletaDetallePage />} />
             <Route path="/" element={<Navigate to="/planillas" replace />} />
           </Route>
         </Route>
