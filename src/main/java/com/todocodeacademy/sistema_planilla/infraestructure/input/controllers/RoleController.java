@@ -11,11 +11,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+// Gestionar roles (verlos, crearlos, editarlos, eliminarlos) es una capacidad
+// exclusiva de administradores: antes cualquiera con un token válido podía hacerlo.
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 @RestController
 @RequestMapping("/api/roles")
 @RequiredArgsConstructor

@@ -7,10 +7,14 @@ import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.Up
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.UsuarioResponse;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Gestionar usuarios (verlos, crearlos, editarlos, eliminarlos) es una capacidad
+// exclusiva de administradores: antes cualquiera con un token válido podía hacerlo.
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 @RestController
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor

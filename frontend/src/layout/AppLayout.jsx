@@ -8,14 +8,15 @@ const NAV_ITEMS = [
   { label: 'Planillas', to: '/planillas', icon: IconReportMoney },
   { label: 'Boletas', to: '/boletas', icon: IconReceipt },
   { label: 'Empleados', to: '/empleados', icon: IconUsers },
-  { label: 'Usuarios', to: '/usuarios', icon: IconUserCog },
+  { label: 'Usuarios', to: '/usuarios', icon: IconUserCog, adminOnly: true },
 ];
 
 export default function AppLayout() {
   const [opened, { toggle }] = useDisclosure();
-  const { username, logout } = useAuth();
+  const { username, logout, isAdmin } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const navItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   const handleLogout = () => {
     logout();
@@ -52,7 +53,7 @@ export default function AppLayout() {
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             component={RouterNavLink}

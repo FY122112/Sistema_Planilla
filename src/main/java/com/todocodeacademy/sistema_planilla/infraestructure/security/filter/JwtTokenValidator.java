@@ -44,10 +44,16 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
                 // Extraer username y authorities
                 String username = jwtUtils.extractUsername(decodedJWT);
-                String authorities = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asString();
+
+                // El claim se firma como arreglo JSON (JwtUtils.createToken usa
+                // withArrayClaim), así que hay que leerlo como arreglo. Claim.asString()
+                // devuelve null para un claim que no es un string plano: con eso, todo
+                // usuario autenticado terminaba con cero authorities sin importar sus
+                // roles reales, algo invisible mientras nada dependía de hasRole(...).
+                String[] authorities = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asArray(String.class);
 
                 Collection<? extends GrantedAuthority> authoritiesList =
-                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
+                        AuthorityUtils.createAuthorityList(authorities != null ? authorities : new String[0]);
 
                 // Solo setear Authentication si aún no existe en el contexto
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {

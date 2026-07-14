@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import client from '../api/client';
+import { rolesFromToken } from './jwt';
 
 const AuthContext = createContext(null);
 
@@ -26,9 +27,13 @@ export function AuthProvider({ children }) {
     setUsername(null);
   }, []);
 
+  const roles = useMemo(() => rolesFromToken(token), [token]);
+
   const value = {
     token,
     username,
+    roles,
+    isAdmin: roles.includes('ADMINISTRADOR'),
     isAuthenticated: Boolean(token),
     login,
     logout,

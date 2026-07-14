@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './auth/AuthContext';
 import ProtectedRoute from './auth/ProtectedRoute';
+import AdminRoute from './auth/AdminRoute';
 import AppLayout from './layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import EmpleadosPage from './pages/EmpleadosPage';
@@ -22,7 +23,11 @@ export default function App() {
             <Route path="/empleados" element={<EmpleadosPage />} />
             <Route path="/empleados/nuevo" element={<EmpleadoFormPage />} />
             <Route path="/empleados/:id/editar" element={<EmpleadoFormPage />} />
-            <Route path="/usuarios" element={<UsuariosPage />} />
+
+            <Route element={<AdminRoute />}>
+              <Route path="/usuarios" element={<UsuariosPage />} />
+            </Route>
+
             <Route path="/planillas" element={<PlanillasPage />} />
             <Route path="/planillas/:id" element={<PlanillaDetallePage />} />
             <Route path="/boletas" element={<BoletasPage />} />
