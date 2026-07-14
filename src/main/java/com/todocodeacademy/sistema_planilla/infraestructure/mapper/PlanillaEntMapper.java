@@ -72,14 +72,17 @@ public class PlanillaEntMapper {
         entity.setCerrada(domain.estaCerrada());
 
         if (domain.getDetallesPlanilla() != null) {
-            List<DetallePlanillaEntity> detalles = domain.getDetallesPlanilla()
+            // Lista mutable: Hibernate necesita poder mutar esta colección en un merge
+            // (p.ej. al cerrar una planilla ya persistida). Stream.toList() devuelve una
+            // lista inmutable y provoca UnsupportedOperationException en ese escenario.
+            List<DetallePlanillaEntity> detalles = new ArrayList<>(domain.getDetallesPlanilla()
                     .stream()
                     .map(det -> {
                         DetallePlanillaEntity d = detalleMapper.toEntity(det);
                         d.setPlanilla(entity); // 🔥 relación clave
                         return d;
                     })
-                    .toList();
+                    .toList());
 
             entity.setDetallesPlanilla(detalles);
         }
