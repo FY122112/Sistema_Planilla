@@ -4,6 +4,7 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import AppLayout from './layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import EmpleadosPage from './pages/EmpleadosPage';
+import EmpleadoFormPage from './pages/EmpleadoFormPage';
 import UsuariosPage from './pages/UsuariosPage';
 import PlanillasPage from './pages/PlanillasPage';
 import PlanillaDetallePage from './pages/PlanillaDetallePage';
@@ -19,6 +20,8 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/empleados" element={<EmpleadosPage />} />
+            <Route path="/empleados/nuevo" element={<EmpleadoFormPage />} />
+            <Route path="/empleados/:id/editar" element={<EmpleadoFormPage />} />
             <Route path="/usuarios" element={<UsuariosPage />} />
             <Route path="/planillas" element={<PlanillasPage />} />
             <Route path="/planillas/:id" element={<PlanillaDetallePage />} />
