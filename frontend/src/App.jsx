@@ -4,6 +4,7 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import AppLayout from './layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import EmpleadosPage from './pages/EmpleadosPage';
+import UsuariosPage from './pages/UsuariosPage';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/empleados" element={<EmpleadosPage />} />
+            <Route path="/usuarios" element={<UsuariosPage />} />
             <Route path="/" element={<Navigate to="/empleados" replace />} />
           </Route>
         </Route>

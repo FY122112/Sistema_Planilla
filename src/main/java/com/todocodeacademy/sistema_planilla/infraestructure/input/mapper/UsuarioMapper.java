@@ -1,22 +1,44 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.input.mapper;
 
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.RoleRepositoryPort;
+import com.todocodeacademy.sistema_planilla.domain.model.Role;
 import com.todocodeacademy.sistema_planilla.domain.model.UsuarioSec;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.CreateUsuarioRequest;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.UpdateUsuarioRequest;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.UsuarioResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class UsuarioMapper {
+
+    private final RoleRepositoryPort roleRepository;
+
     public UsuarioSec toDomain(CreateUsuarioRequest request) {
 
-        return UsuarioSec.crearNuevoUsuario(
+        UsuarioSec usuario = UsuarioSec.crearNuevoUsuario(
                 request.getUsername(),
                 request.getPassword(),
                 request.getEmail()
         );
+
+        Set<Long> roleIds = request.getRoleIds();
+
+        if (roleIds != null) {
+            for (Long roleId : roleIds) {
+                Role role = roleRepository.findById(roleId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException("Rol no encontrado: " + roleId));
+
+                usuario.agregarRol(role);
+            }
+        }
+
+        return usuario;
     }
 
     public UsuarioSec toDomain(UpdateUsuarioRequest request) {
