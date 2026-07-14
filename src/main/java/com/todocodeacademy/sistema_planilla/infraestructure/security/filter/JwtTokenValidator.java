@@ -59,6 +59,7 @@ public class JwtTokenValidator extends OncePerRequestFilter {
             } catch (JWTVerificationException exception) {
                 SecurityContextHolder.clearContext();
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setCharacterEncoding("UTF-8");
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter().write(
                         "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token inválido o expirado\"}"

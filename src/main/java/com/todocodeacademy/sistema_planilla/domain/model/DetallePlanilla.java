@@ -41,6 +41,9 @@ public class DetallePlanilla {
     // =========================
     // 🏗️ CONSTRUCTOR
     // =========================
+    private DetallePlanilla() {
+    }
+
     public DetallePlanilla(
             Planilla planilla,
             Empleado empleado,
@@ -77,6 +80,10 @@ public class DetallePlanilla {
     // =========================
     // 🔄 RECONSTRUCCIÓN
     // =========================
+    // A diferencia del constructor de creación, aquí `planilla` puede llegar null:
+    // el mapper de entidades reconstruye el detalle antes que su planilla padre
+    // (para evitar el ciclo planilla <-> detalle) y lo vincula después con
+    // vincularPlanilla(...).
     public static DetallePlanilla reconstruir(
             Long id,
             Planilla planilla,
@@ -95,11 +102,17 @@ public class DetallePlanilla {
             Instant updatedAt
     ) {
 
-        DetallePlanilla d =
-                new DetallePlanilla(planilla, empleado, sueldoBase);
+        if (empleado == null) {
+            throw new IllegalArgumentException("El empleado es obligatorio");
+        }
+
+        DetallePlanilla d = new DetallePlanilla();
 
         d.idDetalle = id;
+        d.planilla = planilla;
+        d.empleado = empleado;
 
+        d.sueldoBase = safe(sueldoBase);
         d.asignacionFamiliar = safe(asignacionFamiliar);
         d.remuneracionComputableAfecta =
                 safe(remuneracionComputableAfecta);
@@ -130,6 +143,16 @@ public class DetallePlanilla {
         d.updatedAt = updatedAt;
 
         return d;
+    }
+
+    // Vincula el detalle con su planilla padre una vez que esta ya fue reconstruida.
+    public void vincularPlanilla(Planilla planilla) {
+
+        if (planilla == null) {
+            throw new IllegalArgumentException("La planilla es obligatoria");
+        }
+
+        this.planilla = planilla;
     }
 
     // =========================

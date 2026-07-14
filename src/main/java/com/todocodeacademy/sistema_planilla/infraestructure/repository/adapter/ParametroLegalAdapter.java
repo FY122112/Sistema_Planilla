@@ -46,12 +46,14 @@ public class ParametroLegalAdapter implements ParametroLegalRepositoryPort {
 
     @Override
     public Optional<ParametroLegal> findVigenteByCodigoAndFecha(String codigo, LocalDate fecha) {
-        return Optional.empty();
+        return repository.findVigenteByCodigoAndFecha(codigo, fecha)
+                .map(mapper::toDomain);
     }
 
     @Override
     public Optional<ParametroLegal> findTopByCodigoOrderByFechaInicioVigenciaDesc(String codigo) {
-        return Optional.empty();
+        return repository.findTopByCodigoOrderByFechaInicioVigenciaDesc(codigo)
+                .map(mapper::toDomain);
     }
 
     @Override

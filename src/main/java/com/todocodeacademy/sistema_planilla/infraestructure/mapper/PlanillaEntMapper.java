@@ -23,7 +23,15 @@ public class PlanillaEntMapper {
     public Planilla toDomain(PlanillaEntity entity) {
         if (entity == null) return null;
 
-        List<DetallePlanilla> detalles = new ArrayList<>();
+        // Se reconstruyen los detalles antes que la planilla (sin referencia al padre
+        // todavía, para evitar el ciclo planilla <-> detalle).
+        List<DetallePlanilla> detalles =
+                entity.getDetallesPlanilla() != null
+                        ? entity.getDetallesPlanilla()
+                                .stream()
+                                .map(detalleMapper::toDomain)
+                                .toList()
+                        : new ArrayList<>();
 
         Planilla planilla = Planilla.reconstruir(
                 entity.getIdPlanilla(),
@@ -38,12 +46,11 @@ public class PlanillaEntMapper {
                 entity.getUpdateAt()
         );
 
-        // 👇 después de crear la planilla, agregamos los detalles
-        if (entity.getDetallesPlanilla() != null) {
-            for (DetallePlanillaEntity det : entity.getDetallesPlanilla()) {
-                DetallePlanilla d = detalleMapper.toDomain(det);
-                planilla.agregarDetalle(d);
-            }
+        // No se usa agregarDetalle(...) aquí: esa regla de negocio bloquea la
+        // operación cuando la planilla está cerrada, pero recargar detalles ya
+        // persistidos de una planilla cerrada debe funcionar siempre.
+        for (DetallePlanilla d : detalles) {
+            d.vincularPlanilla(planilla);
         }
 
         return planilla;
