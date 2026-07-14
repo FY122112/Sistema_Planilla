@@ -80,10 +80,11 @@ public class DetallePlanilla {
     // =========================
     // 🔄 RECONSTRUCCIÓN
     // =========================
-    // A diferencia del constructor de creación, aquí `planilla` puede llegar null:
-    // el mapper de entidades reconstruye el detalle antes que su planilla padre
-    // (para evitar el ciclo planilla <-> detalle) y lo vincula después con
-    // vincularPlanilla(...).
+    // A diferencia del constructor de creación, aquí `planilla` y `empleado` pueden
+    // llegar null: el mapper de entidades reconstruye el detalle antes que su planilla
+    // padre (para evitar el ciclo planilla <-> detalle) y lo vincula después con
+    // vincularPlanilla(...); BoletaEntMapper también arma una referencia liviana con
+    // solo el id del detalle, sin cargar el empleado, para no traer el agregado completo.
     public static DetallePlanilla reconstruir(
             Long id,
             Planilla planilla,
@@ -101,10 +102,6 @@ public class DetallePlanilla {
             Instant createdAt,
             Instant updatedAt
     ) {
-
-        if (empleado == null) {
-            throw new IllegalArgumentException("El empleado es obligatorio");
-        }
 
         DetallePlanilla d = new DetallePlanilla();
 

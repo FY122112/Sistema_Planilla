@@ -87,6 +87,10 @@ public class Boleta {
             Instant createdAt,
             Instant updatedAt
     ) {
+        // A diferencia de crear(...), aquí no se sustituyen los null por defaults: esta
+        // fábrica también se usa para construir payloads parciales de actualización
+        // (BoletaService.update solo aplica los campos que vengan no-null), y forzar
+        // sueldoBruto/totalDescuento a ZERO o el estado a GENERADA reventaría esa lógica.
         Boleta b = new Boleta();
 
         b.idBoleta = id;
@@ -95,12 +99,12 @@ public class Boleta {
         b.periodoMes = periodoMes;
         b.periodoAnio = periodoAnio;
 
-        b.sueldoBruto = safe(sueldoBruto);
-        b.totalDescuento = safe(totalDescuento);
-        b.sueldoNeto = sueldoNeto != null ? sueldoNeto : BigDecimal.ZERO;
+        b.sueldoBruto = sueldoBruto;
+        b.totalDescuento = totalDescuento;
+        b.sueldoNeto = sueldoNeto;
 
         b.rutaPdf = rutaPdf;
-        b.estadoBoleta = estado != null ? estado : EstadoBoleta.GENERADA;
+        b.estadoBoleta = estado;
 
         b.createdAt = createdAt;
         b.updatedAt = updatedAt;

@@ -90,6 +90,12 @@ public class BoletaEntMapper {
         entity.setRutaPdf(domain.getRutaPdf());
         entity.setEstadoBoleta(domain.getEstadoBoleta());
 
+        // created_at es updatable=false (Hibernate lo ignora en el UPDATE), pero si no
+        // se copia aquí la entidad recién construida para el merge queda con createdAt en
+        // null en memoria, y eso es lo que se refleja en la respuesta justo después de un
+        // update (aunque el valor real en la fila de la BD nunca se pierde).
+        entity.setCreatedAt(domain.getCreatedAt());
+
         return entity;
     }
 }
