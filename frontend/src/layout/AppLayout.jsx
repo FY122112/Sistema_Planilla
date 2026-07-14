@@ -1,10 +1,11 @@
 import { AppShell, Burger, Group, NavLink, Text, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconUsers, IconUserCog, IconLogout } from '@tabler/icons-react';
+import { IconUsers, IconUserCog, IconLogout, IconReportMoney } from '@tabler/icons-react';
 import { NavLink as RouterNavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
 const NAV_ITEMS = [
+  { label: 'Planillas', to: '/planillas', icon: IconReportMoney },
   { label: 'Empleados', to: '/empleados', icon: IconUsers },
   { label: 'Usuarios', to: '/usuarios', icon: IconUserCog },
 ];

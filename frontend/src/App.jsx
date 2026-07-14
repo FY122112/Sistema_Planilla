@@ -5,6 +5,8 @@ import AppLayout from './layout/AppLayout';
 import LoginPage from './pages/LoginPage';
 import EmpleadosPage from './pages/EmpleadosPage';
 import UsuariosPage from './pages/UsuariosPage';
+import PlanillasPage from './pages/PlanillasPage';
+import PlanillaDetallePage from './pages/PlanillaDetallePage';
 
 export default function App() {
   return (
@@ -16,7 +18,9 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path="/empleados" element={<EmpleadosPage />} />
             <Route path="/usuarios" element={<UsuariosPage />} />
-            <Route path="/" element={<Navigate to="/empleados" replace />} />
+            <Route path="/planillas" element={<PlanillasPage />} />
+            <Route path="/planillas/:id" element={<PlanillaDetallePage />} />
+            <Route path="/" element={<Navigate to="/planillas" replace />} />
           </Route>
         </Route>
 

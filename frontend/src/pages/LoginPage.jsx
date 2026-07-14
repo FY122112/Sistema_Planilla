@@ -22,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(values.username, values.password);
-      navigate('/empleados', { replace: true });
+      navigate('/planillas', { replace: true });
     } catch (error) {
       const message =
         error.response?.data?.message || 'Usuario o contraseña incorrectos';
