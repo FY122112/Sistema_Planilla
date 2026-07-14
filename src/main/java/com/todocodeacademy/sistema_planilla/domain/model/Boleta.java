@@ -131,6 +131,14 @@ public class Boleta {
         this.estadoBoleta = EstadoBoleta.GENERADA;
     }
 
+    public void marcarComoFirmada() {
+        this.estadoBoleta = EstadoBoleta.FIRMADA;
+    }
+
+    public void marcarComoEnviada() {
+        this.estadoBoleta = EstadoBoleta.ENVIADA;
+    }
+
     public void marcarComoPagada() {
         this.estadoBoleta = EstadoBoleta.PAGADA;
     }

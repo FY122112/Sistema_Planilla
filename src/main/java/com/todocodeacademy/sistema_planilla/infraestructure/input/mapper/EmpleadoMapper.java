@@ -142,9 +142,11 @@ public class EmpleadoMapper {
         }
 
         // REGIMEN
-        if (request.regimenLaboral() != null) {
+        if (request.regimenLaboral() != null || request.tieneHijosCalificados() != null) {
             actual.actualizarRegimenLaboral(
-                    request.regimenLaboral(),
+                    request.regimenLaboral() != null
+                            ? request.regimenLaboral()
+                            : actual.getRegimenLaboral(),
                     request.tieneHijosCalificados() != null
                             ? request.tieneHijosCalificados()
                             : actual.isTieneHijosCalificados()

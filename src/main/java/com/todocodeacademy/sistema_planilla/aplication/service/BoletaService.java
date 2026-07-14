@@ -42,10 +42,11 @@ public class BoletaService implements BoletaServicePort {
         }
 
         if (boleta.getEstadoBoleta() != null) {
-            if (boleta.getEstadoBoleta().name().equals("PAGADA")) {
-                actual.marcarComoPagada();
-            } else {
-                actual.marcarComoGenerada();
+            switch (boleta.getEstadoBoleta()) {
+                case PAGADA -> actual.marcarComoPagada();
+                case FIRMADA -> actual.marcarComoFirmada();
+                case ENVIADA -> actual.marcarComoEnviada();
+                case GENERADA -> actual.marcarComoGenerada();
             }
         }
 

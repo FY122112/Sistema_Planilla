@@ -1,5 +1,6 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.security.filter;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.todocodeacademy.sistema_planilla.infraestructure.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
@@ -7,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,22 +38,32 @@ public class JwtTokenValidator extends OncePerRequestFilter {
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
             jwtToken = jwtToken.substring(7);
 
-            // Validar y decodificar el token
-            DecodedJWT decodedJWT = jwtUtils.validateToken(jwtToken);
+            try {
+                // Validar y decodificar el token
+                DecodedJWT decodedJWT = jwtUtils.validateToken(jwtToken);
 
-            // Extraer username y authorities
-            String username = jwtUtils.extractUsername(decodedJWT);
-            String authorities = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asString();
+                // Extraer username y authorities
+                String username = jwtUtils.extractUsername(decodedJWT);
+                String authorities = jwtUtils.getSpecificClaim(decodedJWT, "authorities").asString();
 
-            Collection<? extends GrantedAuthority> authoritiesList =
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
+                Collection<? extends GrantedAuthority> authoritiesList =
+                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
 
-            // Solo setear Authentication si aún no existe en el contexto
-            if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(username, null, authoritiesList);
+                // Solo setear Authentication si aún no existe en el contexto
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Authentication authentication =
+                            new UsernamePasswordAuthenticationToken(username, null, authoritiesList);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JWTVerificationException exception) {
+                SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.getWriter().write(
+                        "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token inválido o expirado\"}"
+                );
+                return;
             }
         }
 

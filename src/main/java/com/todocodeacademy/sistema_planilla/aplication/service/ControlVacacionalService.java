@@ -82,10 +82,18 @@ public class ControlVacacionalService
 
         if (controlVacacion.getDiasGanados() != null) {
 
-            actual.asignarDias(
+            int delta =
                     controlVacacion.getDiasGanados()
-                            - actual.getDiasGanados()
-            );
+                            - actual.getDiasGanados();
+
+            if (delta > 0) {
+                actual.asignarDias(delta);
+            } else if (delta < 0) {
+                throw new IllegalArgumentException(
+                        "No se puede reducir los días ganados mediante esta operación"
+                );
+            }
+            // delta == 0: valor sin cambios, no-op idempotente
         }
 
         return repository.save(actual);
