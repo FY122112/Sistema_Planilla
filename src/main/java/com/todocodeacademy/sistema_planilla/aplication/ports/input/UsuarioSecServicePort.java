@@ -14,6 +14,8 @@ public interface UsuarioSecServicePort {
 
     UsuarioSec update(Long id, UsuarioSec usuarioSec);
 
+    UsuarioSec cambiarEstado(Long id, boolean enabled);
+
     void deleteById(Long id);
 
     UsuarioSec findByUsername(String username);

@@ -84,6 +84,21 @@ public class UsuarioSecService implements UsuarioSecServicePort {
     }
 
     @Override
+    public UsuarioSec cambiarEstado(Long id, boolean enabled) {
+
+        UsuarioSec actual = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        if (enabled) {
+            actual.habilitar();
+        } else {
+            actual.deshabilitar();
+        }
+
+        return repository.save(actual);
+    }
+
+    @Override
     public void deleteById(Long id) {
         repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));

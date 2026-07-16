@@ -15,3 +15,7 @@ export function updateUsuario(id, { username, password, email, enabled, empleado
     .put(`/api/usuarios/${id}`, { username, password, email, enabled, empleadoId })
     .then((res) => res.data);
 }
+
+export function deleteUsuario(id) {
+  return client.delete(`/api/usuarios/${id}`);
+}

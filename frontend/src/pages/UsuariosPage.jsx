@@ -7,6 +7,7 @@ import {
   MultiSelect,
   PasswordInput,
   Select,
+  Switch,
   Table,
   Text,
   TextInput,
@@ -17,10 +18,11 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconEdit, IconPlus } from '@tabler/icons-react';
-import { createUsuario, fetchUsuarios, updateUsuario } from '../api/usuarios';
+import { IconEdit, IconPlus, IconTrash } from '@tabler/icons-react';
+import { createUsuario, deleteUsuario, fetchUsuarios, updateUsuario } from '../api/usuarios';
 import { fetchRoles } from '../api/roles';
 import { fetchEmpleados } from '../api/empleados';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([]);
@@ -32,6 +34,8 @@ export default function UsuariosPage() {
   const [editando, setEditando] = useState(null);
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const form = useForm({
     initialValues: { username: '', password: '', email: '', roleIds: [], empleadoId: '' },
@@ -44,7 +48,7 @@ export default function UsuariosPage() {
   });
 
   const editForm = useForm({
-    initialValues: { username: '', email: '', password: '', empleadoId: '' },
+    initialValues: { username: '', email: '', password: '', empleadoId: '', enabled: true },
     validate: {
       username: (value) => (value.trim().length === 0 ? 'El usuario es obligatorio' : null),
       email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Correo inválido'),
@@ -124,6 +128,7 @@ export default function UsuariosPage() {
       email: usuario.email,
       password: '',
       empleadoId: usuario.empleadoId ? String(usuario.empleadoId) : '',
+      enabled: usuario.enabled,
     });
     openEdit();
   };
@@ -136,6 +141,7 @@ export default function UsuariosPage() {
         email: values.email,
         password: values.password || undefined,
         empleadoId: values.empleadoId ? Number(values.empleadoId) : null,
+        enabled: values.enabled,
       });
 
       notifications.show({ color: 'green', title: 'Usuario actualizado', message: '' });
@@ -148,6 +154,22 @@ export default function UsuariosPage() {
       notifications.show({ color: 'red', title: 'Error', message });
     } finally {
       setSavingEdit(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    setDeleting(true);
+    try {
+      await deleteUsuario(toDelete.idUsuario);
+      notifications.show({ color: 'green', title: 'Usuario eliminado', message: '' });
+      setToDelete(null);
+      loadData();
+    } catch (error) {
+      const message = error.response?.data?.message || 'No se pudo eliminar el usuario';
+      notifications.show({ color: 'red', title: 'Error', message });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -207,6 +229,11 @@ export default function UsuariosPage() {
                   <Tooltip label="Editar">
                     <ActionIcon variant="subtle" onClick={() => handleAbrirEdicion(usuario)}>
                       <IconEdit size={18} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label="Eliminar">
+                    <ActionIcon variant="subtle" color="red" onClick={() => setToDelete(usuario)}>
+                      <IconTrash size={18} />
                     </ActionIcon>
                   </Tooltip>
                 </Group>
@@ -291,6 +318,13 @@ export default function UsuariosPage() {
             mt="sm"
             {...editForm.getInputProps('empleadoId')}
           />
+          <Switch
+            label="Usuario activo"
+            description="Un usuario inactivo no puede iniciar sesión"
+            mt="md"
+            checked={editForm.values.enabled}
+            onChange={(event) => editForm.setFieldValue('enabled', event.currentTarget.checked)}
+          />
           <Group justify="flex-end" mt="lg">
             <Button variant="default" onClick={closeEdit}>
               Cancelar
@@ -301,6 +335,19 @@ export default function UsuariosPage() {
           </Group>
         </form>
       </Modal>
+
+      <ConfirmModal
+        opened={Boolean(toDelete)}
+        title="Eliminar usuario"
+        message={
+          toDelete
+            ? `¿Seguro que quieres eliminar la cuenta "${toDelete.username}"? Esta acción no se puede deshacer.`
+            : ''
+        }
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setToDelete(null)}
+      />
     </>
   );
 }

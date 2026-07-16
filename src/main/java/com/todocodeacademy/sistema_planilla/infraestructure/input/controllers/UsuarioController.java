@@ -81,9 +81,16 @@ public class UsuarioController {
 
         UsuarioSec usuario = mapper.toDomain(request);
 
-        return mapper.toResponse(
-                service.update(id, usuario)
-        );
+        UsuarioSec actualizado = service.update(id, usuario);
+
+        // Se maneja aparte del resto de campos: UsuarioSec.enabled es un boolean primitivo
+        // (siempre resuelto a true/false), así que no hay forma de distinguir "no vino en
+        // la petición" de "vino en false" una vez mapeado — por eso se revisa el DTO crudo.
+        if (request.getEnabled() != null) {
+            actualizado = service.cambiarEstado(id, request.getEnabled());
+        }
+
+        return mapper.toResponse(actualizado);
     }
 
     @DeleteMapping("/{id}")
