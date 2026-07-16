@@ -76,6 +76,10 @@ public class UsuarioSecService implements UsuarioSecServicePort {
             actual.actualizarPassword(passwordEncoder.encode(usuarioSec.getPassword()));
         }
 
+        if (usuarioSec.getEmpleado() != null) {
+            actual.asignarEmpleado(usuarioSec.getEmpleado());
+        }
+
         return repository.save(actual);
     }
 

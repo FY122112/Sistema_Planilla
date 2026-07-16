@@ -65,6 +65,13 @@ public class UsuarioMapper {
 
     public UsuarioSec toDomain(UpdateUsuarioRequest request) {
 
+        Empleado empleado = null;
+        if (request.getEmpleadoId() != null) {
+            empleado = empleadoRepository.findById(request.getEmpleadoId())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Empleado no encontrado: " + request.getEmpleadoId()));
+        }
+
         return UsuarioSec.reconstruir(
                 null,
                 request.getUsername(),
@@ -75,7 +82,7 @@ public class UsuarioMapper {
                 true,
                 true,
                 null,
-                null,
+                empleado,
                 null,
                 null,
                 null,

@@ -15,4 +15,6 @@ public class UpdateUsuarioRequest {
 
     private Boolean enabled;
 
+    private Long empleadoId;
+
 }

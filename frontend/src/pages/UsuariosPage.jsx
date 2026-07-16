@@ -6,27 +6,35 @@ import {
   Modal,
   MultiSelect,
   PasswordInput,
+  Select,
   Table,
   Text,
   TextInput,
   Title,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconPlus } from '@tabler/icons-react';
-import { createUsuario, fetchUsuarios } from '../api/usuarios';
+import { IconEdit, IconPlus } from '@tabler/icons-react';
+import { createUsuario, fetchUsuarios, updateUsuario } from '../api/usuarios';
 import { fetchRoles } from '../api/roles';
+import { fetchEmpleados } from '../api/empleados';
 
 export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [editando, setEditando] = useState(null);
+  const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const form = useForm({
-    initialValues: { username: '', password: '', email: '', roleIds: [] },
+    initialValues: { username: '', password: '', email: '', roleIds: [], empleadoId: '' },
     validate: {
       username: (value) => (value.trim().length === 0 ? 'El usuario es obligatorio' : null),
       password: (value) =>
@@ -35,18 +43,28 @@ export default function UsuariosPage() {
     },
   });
 
+  const editForm = useForm({
+    initialValues: { username: '', email: '', password: '', empleadoId: '' },
+    validate: {
+      username: (value) => (value.trim().length === 0 ? 'El usuario es obligatorio' : null),
+      email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Correo inválido'),
+      password: (value) => (value && value.length < 8 ? 'La contraseña debe tener al menos 8 caracteres' : null),
+    },
+  });
+
   const loadData = () => {
     setLoading(true);
-    return Promise.all([fetchUsuarios(), fetchRoles()])
-      .then(([usuariosData, rolesData]) => {
+    return Promise.all([fetchUsuarios(), fetchRoles(), fetchEmpleados()])
+      .then(([usuariosData, rolesData, empleadosData]) => {
         setUsuarios(usuariosData);
         setRoles(rolesData);
+        setEmpleados(empleadosData);
       })
       .catch(() => {
         notifications.show({
           color: 'red',
           title: 'Error',
-          message: 'No se pudo cargar usuarios o roles',
+          message: 'No se pudo cargar usuarios, roles o empleados',
         });
       })
       .finally(() => setLoading(false));
@@ -61,6 +79,16 @@ export default function UsuariosPage() {
     label: role.name,
   }));
 
+  const empleadoOptions = empleados.map((empleado) => ({
+    value: String(empleado.idEmpleado),
+    label: `${empleado.nombre} ${empleado.apellido} (${empleado.numeroDocumento})`,
+  }));
+
+  const nombreEmpleado = (empleadoId) => {
+    const empleado = empleados.find((e) => e.idEmpleado === empleadoId);
+    return empleado ? `${empleado.nombre} ${empleado.apellido}` : null;
+  };
+
   const handleSubmit = async (values) => {
     setSaving(true);
     try {
@@ -69,6 +97,7 @@ export default function UsuariosPage() {
         password: values.password,
         email: values.email,
         roleIds: values.roleIds.map(Number),
+        empleadoId: values.empleadoId ? Number(values.empleadoId) : null,
       });
 
       notifications.show({
@@ -88,6 +117,40 @@ export default function UsuariosPage() {
     }
   };
 
+  const handleAbrirEdicion = (usuario) => {
+    setEditando(usuario);
+    editForm.setValues({
+      username: usuario.username,
+      email: usuario.email,
+      password: '',
+      empleadoId: usuario.empleadoId ? String(usuario.empleadoId) : '',
+    });
+    openEdit();
+  };
+
+  const handleSubmitEdit = async (values) => {
+    setSavingEdit(true);
+    try {
+      await updateUsuario(editando.idUsuario, {
+        username: values.username,
+        email: values.email,
+        password: values.password || undefined,
+        empleadoId: values.empleadoId ? Number(values.empleadoId) : null,
+      });
+
+      notifications.show({ color: 'green', title: 'Usuario actualizado', message: '' });
+
+      closeEdit();
+      setEditando(null);
+      loadData();
+    } catch (error) {
+      const message = error.response?.data?.message || 'No se pudo actualizar el usuario';
+      notifications.show({ color: 'red', title: 'Error', message });
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   return (
     <>
       <Group justify="space-between" mb="md">
@@ -102,8 +165,10 @@ export default function UsuariosPage() {
           <Table.Tr>
             <Table.Th>Usuario</Table.Th>
             <Table.Th>Correo</Table.Th>
+            <Table.Th>Empleado vinculado</Table.Th>
             <Table.Th>Roles</Table.Th>
             <Table.Th>Estado</Table.Th>
+            <Table.Th ta="right">Acciones</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -111,6 +176,13 @@ export default function UsuariosPage() {
             <Table.Tr key={usuario.idUsuario}>
               <Table.Td>{usuario.username}</Table.Td>
               <Table.Td>{usuario.email}</Table.Td>
+              <Table.Td>
+                {nombreEmpleado(usuario.empleadoId) ?? (
+                  <Text size="xs" c="dimmed">
+                    Sin vincular
+                  </Text>
+                )}
+              </Table.Td>
               <Table.Td>
                 <Group gap={4}>
                   {usuario.roles.length === 0 && (
@@ -129,6 +201,15 @@ export default function UsuariosPage() {
                 <Badge color={usuario.enabled ? 'green' : 'gray'}>
                   {usuario.enabled ? 'Activo' : 'Inactivo'}
                 </Badge>
+              </Table.Td>
+              <Table.Td>
+                <Group justify="flex-end">
+                  <Tooltip label="Editar">
+                    <ActionIcon variant="subtle" onClick={() => handleAbrirEdicion(usuario)}>
+                      <IconEdit size={18} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
               </Table.Td>
             </Table.Tr>
           ))}
@@ -170,11 +251,51 @@ export default function UsuariosPage() {
             mt="sm"
             {...form.getInputProps('roleIds')}
           />
+          <Select
+            label="Empleado vinculado"
+            description="Obligatorio si el usuario va a entrar al portal de autoservicio (rol EMPLEADO)"
+            placeholder="Selecciona un empleado (opcional)"
+            data={empleadoOptions}
+            searchable
+            clearable
+            mt="sm"
+            {...form.getInputProps('empleadoId')}
+          />
           <Group justify="flex-end" mt="lg">
             <Button variant="default" onClick={close}>
               Cancelar
             </Button>
             <Button type="submit" loading={saving}>
+              Guardar
+            </Button>
+          </Group>
+        </form>
+      </Modal>
+
+      <Modal opened={editOpened} onClose={closeEdit} title={`Editar usuario — ${editando?.username ?? ''}`} centered>
+        <form onSubmit={editForm.onSubmit(handleSubmitEdit)}>
+          <TextInput label="Usuario" required {...editForm.getInputProps('username')} />
+          <TextInput label="Correo" required mt="sm" {...editForm.getInputProps('email')} />
+          <PasswordInput
+            label="Nueva contraseña"
+            placeholder="Dejar en blanco para no cambiarla"
+            mt="sm"
+            {...editForm.getInputProps('password')}
+          />
+          <Select
+            label="Empleado vinculado"
+            description="Solo se puede cambiar a otro empleado, no se puede desvincular desde aquí"
+            placeholder="Selecciona un empleado"
+            data={empleadoOptions}
+            searchable
+            mt="sm"
+            {...editForm.getInputProps('empleadoId')}
+          />
+          <Group justify="flex-end" mt="lg">
+            <Button variant="default" onClick={closeEdit}>
+              Cancelar
+            </Button>
+            <Button type="submit" loading={savingEdit}>
               Guardar
             </Button>
           </Group>

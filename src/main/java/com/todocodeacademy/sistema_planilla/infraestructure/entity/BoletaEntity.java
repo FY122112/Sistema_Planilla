@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -68,4 +69,10 @@ public class BoletaEntity {
     @UpdateTimestamp
     @Column(name="updated_at", nullable = false)
     Instant updatedAt;
+
+    // Sin esto, borrar una boleta (directo o en cascada al eliminar su planilla) fallaba
+    // con una violación de FK en cuanto existía un reclamo (solicitud_ajuste) sobre ella:
+    // esa tabla no tenía forma de enterarse de que su boleta desapareció.
+    @OneToMany(mappedBy = "boleta", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<SolicitudAjusteEntity> solicitudesAjuste;
 }
