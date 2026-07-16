@@ -24,6 +24,7 @@ public record EmpleadoResponse(
 
         String nacionalidad,
         String correo,
+        String telefono,
 
         String direccionCompleta,
         String distrito,

@@ -109,8 +109,10 @@ class PlanillaGenerationIntegrationTest {
         DetallePlanilla miDetalle = buscarDetalleDelEmpleadoDePrueba(generada, numeroDocumentoPrueba);
 
         BigDecimal sueldoBaseEsperado = new BigDecimal("3000.00");
-        BigDecimal totalDescuentoEsperado = new BigDecimal("390.00"); // 13% ONP sobre el sueldo base
         BigDecimal sueldoBrutoEsperado = sueldoBaseEsperado.add(asignacionFamiliarEsperada);
+        // 13% ONP sobre la remuneración computable completa (sueldo base + asignación
+        // familiar): 3113.00 * 13% = 404.69.
+        BigDecimal totalDescuentoEsperado = new BigDecimal("404.69");
         BigDecimal sueldoNetoEsperado = sueldoBrutoEsperado.subtract(totalDescuentoEsperado);
 
         assertThat(miDetalle.getSueldoBase()).isEqualByComparingTo(sueldoBaseEsperado);

@@ -11,7 +11,10 @@ import java.util.Optional;
 
 public interface JpaEmpleadoRepository extends JpaRepository<EmpleadoEntity,Long> {
 
-    Optional<EmpleadoEntity> findByNumeroDocumento(String numeroDocumento);
+    // El DNI ya no es único a nivel de columna (HU-029: puede repetirse entre un registro
+    // eliminado lógicamente y su corrección), así que la búsqueda "activa" excluye los
+    // eliminados explícitamente para no romper la unicidad esperada del resultado.
+    Optional<EmpleadoEntity> findByNumeroDocumentoAndEliminadoFalse(String numeroDocumento);
 
     /**
      * Busca todos los empleados que tienen un estado específico.

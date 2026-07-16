@@ -61,4 +61,13 @@ public class AsistenciaRepositoryAdapter implements AsistenciaRepositoryPort {
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
+    @Override
+    public List<Long> findIdsEmpleadosConAsistencia(List<Long> idsEmpleados, LocalDate fechaInicio, LocalDate fechaFin) {
+        return repository.findByEmpleado_IdEmpleadoInAndFechaBetween(idsEmpleados, fechaInicio, fechaFin)
+                .stream()
+                .map(a -> a.getEmpleado().getIdEmpleado())
+                .distinct()
+                .toList();
+    }
 }

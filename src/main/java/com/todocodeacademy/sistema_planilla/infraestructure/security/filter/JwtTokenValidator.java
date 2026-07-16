@@ -2,6 +2,7 @@ package com.todocodeacademy.sistema_planilla.infraestructure.security.filter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.todocodeacademy.sistema_planilla.infraestructure.security.AuthenticatedPrincipal;
 import com.todocodeacademy.sistema_planilla.infraestructure.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -55,10 +56,19 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                 Collection<? extends GrantedAuthority> authoritiesList =
                         AuthorityUtils.createAuthorityList(authorities != null ? authorities : new String[0]);
 
+                // El claim es opcional: una cuenta ADMINISTRADOR sin empleado vinculado no
+                // lo trae, y decodedJWT.getClaim(...) devuelve un Claim "vacío" (no null) en
+                // ese caso, cuyo asLong() sí devuelve null de forma segura.
+                Long idEmpleado = jwtUtils.getSpecificClaim(decodedJWT, "idEmpleado").asLong();
+
                 // Solo setear Authentication si aún no existe en el contexto
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     Authentication authentication =
-                            new UsernamePasswordAuthenticationToken(username, null, authoritiesList);
+                            new UsernamePasswordAuthenticationToken(
+                                    new AuthenticatedPrincipal(username, idEmpleado),
+                                    null,
+                                    authoritiesList
+                            );
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }

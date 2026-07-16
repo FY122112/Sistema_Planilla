@@ -46,6 +46,10 @@ public class SecurityConfig {
                         // autenticarse. Antes /api/banco, /api/usuarios y /api/roles también
                         // estaban abiertos sin token; cualquiera podía crear usuarios o roles.
                         .requestMatchers("/auth/login/**").permitAll()
+                        // Enlace de boleta para WhatsApp (HU-060): quien lo abre no tiene sesión
+                        // iniciada. Está protegido por su propio token de un solo alcance
+                        // (JwtUtils#validateBoletaShareToken), no por el filtro de JWT normal.
+                        .requestMatchers("/api/boletas/compartida/**").permitAll()
                         .anyRequest().authenticated() // todo lo demás requiere token
                 )
                 .build();

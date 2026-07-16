@@ -20,4 +20,6 @@ public interface AsistenciaRepositoryPort {
 
     void deleteById(Long id);
 
+    List<Long> findIdsEmpleadosConAsistencia(List<Long> idsEmpleados, LocalDate fechaInicio, LocalDate fechaFin);
+
 }

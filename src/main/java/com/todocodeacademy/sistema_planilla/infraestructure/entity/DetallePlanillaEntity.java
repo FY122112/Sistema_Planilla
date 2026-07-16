@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,21 @@ public class DetallePlanillaEntity {
 
     private BigDecimal sueldoBruto;
     private BigDecimal sueldoNeto;
+
+    private Integer diasNoLaborados;
+    private Integer minutosTardanza;
+    private BigDecimal horasExtras25;
+    private BigDecimal horasExtras35;
+    private Integer diasVacacionesGozadas;
+
+    @Column(name = "vacaciones_fecha_inicio")
+    private LocalDate vacacionesFechaInicio;
+
+    @Column(name = "vacaciones_fecha_fin")
+    private LocalDate vacacionesFechaFin;
+
+    private BigDecimal bonificacionEficiencia;
+    private BigDecimal comisionComercial;
 
     // 🔥 RELACIÓN IMPORTANTE
     @OneToMany(mappedBy = "detallePlanilla", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -40,7 +40,10 @@ public class EmpleadoEntity {
     @Column(name = "tipo_documento", nullable = false)
     TipoDocumento tipoDocumento;
 
-    @Column(name = "numero_documento", nullable = false, unique = true, length = 20)
+    // Sin "unique = true" a nivel de columna: un DNI puede repetirse entre un registro
+    // eliminado lógicamente y su corrección posterior (HU-029). La unicidad real (solo
+    // entre empleados no eliminados) se valida en EmpleadoService.save()/update().
+    @Column(name = "numero_documento", nullable = false, length = 20)
     String numeroDocumento;
 
     @Column(name = "fecha_nacimiento", nullable = false)
@@ -59,6 +62,9 @@ public class EmpleadoEntity {
 
     @Column(length = 100)
     String correo;
+
+    @Column(length = 20)
+    String telefono;
 
     @Column(name = "direccion_completa", length = 255)
     String direccionCompleta;
@@ -84,6 +90,13 @@ public class EmpleadoEntity {
 
     @Column(name = "fecha_cese")
     LocalDate fechaCese;
+
+    // Baja lógica administrativa (HU-029): distinta de "estado" (activo/cesado). Se
+    // conserva la fila para no romper el FK de planillas/boletas históricas.
+    // columnDefinition con DEFAULT explícito: ddl-auto=update añade esta columna a una
+    // tabla ya poblada, y sin default MySQL en modo estricto rechaza el ALTER NOT NULL.
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    boolean eliminado;
 
     // =========================
     // RELACIONES

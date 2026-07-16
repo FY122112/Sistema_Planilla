@@ -20,6 +20,7 @@ public record UpdateEmpleadoRequest(
 
         String nacionalidad,
         String correo,
+        String telefono,
 
         String direccionCompleta,
         String distrito,

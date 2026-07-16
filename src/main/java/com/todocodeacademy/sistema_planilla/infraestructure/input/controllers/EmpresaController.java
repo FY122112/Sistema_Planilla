@@ -16,10 +16,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Modificar los datos de la empresa es configuración global, exclusiva del Administrador
+// (@PreAuthorize por método en los endpoints de escritura). La lectura queda abierta a
+// cualquier autenticado porque tanto la boleta del portal admin como la del portal de
+// autoservicio del empleado necesitan el encabezado (razón social/RUC/dirección).
 @RestController
 @RequestMapping("/api/empresa")
 @RequiredArgsConstructor
@@ -63,6 +68,7 @@ public class EmpresaController {
     // =========================
     // 💾 CREAR
     // =========================
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<EmpresaResponseDTO>
     save(
@@ -87,6 +93,7 @@ public class EmpresaController {
     // =========================
     // ✏️ ACTUALIZAR
     // =========================
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<EmpresaResponseDTO>
     update(
@@ -120,6 +127,7 @@ public class EmpresaController {
     // =========================
     // ❌ ELIMINAR
     // =========================
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void>
     delete(

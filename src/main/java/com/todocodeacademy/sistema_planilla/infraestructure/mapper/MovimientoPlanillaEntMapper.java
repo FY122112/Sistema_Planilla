@@ -51,9 +51,13 @@ public class MovimientoPlanillaEntMapper {
         }
 
         if (domain.getConcepto() != null) {
-            ConceptoPagoEntity concepto = new ConceptoPagoEntity();
-            concepto.setIdConcepto(domain.getConcepto().getIdConcepto());
-            entity.setConcepto(concepto);
+            // A diferencia de detallePlanilla (una referencia real hacia el padre, que
+            // igual se recarga completo desde su propio repositorio), acá sí conviene
+            // mapear el ConceptoPago completo: los movimientos se re-mapean a dominio
+            // justo después de guardar (ver PlanillaRepositoryAdapter.save), y un stub
+            // con solo el id dejaría nombreConcepto/tipoConcepto en null en esa vuelta,
+            // rompiendo la validación de ConceptoPago.reconstruir(...).
+            entity.setConcepto(mapperConcepto.toEntity(domain.getConcepto()));
         }
 
         return entity;

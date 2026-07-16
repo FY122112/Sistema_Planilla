@@ -13,3 +13,11 @@ export function siguienteEstado(estadoActual) {
   if (index === -1 || index === ORDEN_ESTADOS_BOLETA.length - 1) return null;
   return ORDEN_ESTADOS_BOLETA[index + 1];
 }
+
+// Igual que siguienteEstado, pero para el botón de avance del Administrador: GENERADA →
+// FIRMADA ahora es una acción exclusiva del propio empleado (portal de autoservicio,
+// "Confirmar conformidad"), así que el admin no debe poder saltarla.
+export function siguienteEstadoAdmin(estadoActual) {
+  const siguiente = siguienteEstado(estadoActual);
+  return siguiente === 'FIRMADA' ? null : siguiente;
+}

@@ -24,5 +24,6 @@ public interface AsistenciaServicePort {
 
     void deleteById(Long id);
 
+    List<Long> idsEmpleadosSinAsistencia(List<Long> idsEmpleados, Integer mes, Integer anio);
 
 }

@@ -9,10 +9,13 @@ import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.Concept
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Catálogo de conceptos de pago: configuración global, exclusiva del Administrador.
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 @RestController
 @RequestMapping("api/concepto")
 @RequiredArgsConstructor

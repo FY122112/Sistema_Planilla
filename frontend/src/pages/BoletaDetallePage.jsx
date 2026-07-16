@@ -14,11 +14,18 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IconArrowLeft, IconPrinter, IconTrash } from '@tabler/icons-react';
-import { deleteBoleta, fetchBoletaById, updateBoleta } from '../api/boletas';
+import { IconArrowLeft, IconBrandWhatsapp, IconFileTypePdf, IconPrinter, IconTrash } from '@tabler/icons-react';
+import { API_BASE_URL } from '../api/client';
+import {
+  crearEnlaceCompartidoBoleta,
+  deleteBoleta,
+  descargarBoletaPdf,
+  fetchBoletaById,
+  updateBoleta,
+} from '../api/boletas';
 import { fetchEmpresas } from '../api/empresa';
-import { ESTADO_BOLETA_INFO, ORDEN_ESTADOS_BOLETA, siguienteEstado } from '../constants/boleta';
-import { formatearMoneda, nombreMes } from '../constants/planilla';
+import { ESTADO_BOLETA_INFO, ORDEN_ESTADOS_BOLETA, siguienteEstadoAdmin } from '../constants/boleta';
+import { formatearMoneda, formatearVacacionesGozadas, nombreMes } from '../constants/planilla';
 import ConfirmModal from '../components/ConfirmModal';
 
 const ACCION_POR_ESTADO = {
@@ -36,6 +43,8 @@ export default function BoletaDetallePage() {
   const [avanzando, setAvanzando] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [descargando, setDescargando] = useState(false);
+  const [compartiendo, setCompartiendo] = useState(false);
 
   const loadData = () => {
     setLoading(true);
@@ -57,7 +66,7 @@ export default function BoletaDetallePage() {
   }, [id]);
 
   const handleAvanzarEstado = async () => {
-    const nuevoEstado = siguienteEstado(boleta.estadoBoleta);
+    const nuevoEstado = siguienteEstadoAdmin(boleta.estadoBoleta);
     if (!nuevoEstado) return;
 
     setAvanzando(true);
@@ -70,6 +79,42 @@ export default function BoletaDetallePage() {
       notifications.show({ color: 'red', title: 'Error', message });
     } finally {
       setAvanzando(false);
+    }
+  };
+
+  const handleDescargarPdf = async () => {
+    setDescargando(true);
+    try {
+      const blob = await descargarBoletaPdf(id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `boleta-${boleta.numeroDocumento ?? id}-${boleta.periodoMes}-${boleta.periodoAnio}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      notifications.show({ color: 'red', title: 'Error', message: 'No se pudo descargar el PDF' });
+    } finally {
+      setDescargando(false);
+    }
+  };
+
+  const handleEnviarWhatsapp = async () => {
+    setCompartiendo(true);
+    try {
+      const { rutaDescarga } = await crearEnlaceCompartidoBoleta(id);
+      const digitos = (boleta.telefonoEmpleado ?? '').replace(/\D/g, '');
+      const enlace = `${API_BASE_URL}${rutaDescarga}`;
+      const texto = encodeURIComponent(
+        `Hola ${boleta.empleado ?? ''}, aquí está tu boleta de pago de ${nombreMes(boleta.periodoMes)} ${boleta.periodoAnio}: ${enlace}`,
+      );
+      window.open(`https://wa.me/51${digitos}?text=${texto}`, '_blank');
+    } catch (error) {
+      notifications.show({ color: 'red', title: 'Error', message: 'No se pudo generar el enlace para WhatsApp' });
+    } finally {
+      setCompartiendo(false);
     }
   };
 
@@ -99,7 +144,7 @@ export default function BoletaDetallePage() {
   if (!boleta) return null;
 
   const estado = ESTADO_BOLETA_INFO[boleta.estadoBoleta] ?? { label: boleta.estadoBoleta, color: 'gray' };
-  const proximoEstado = siguienteEstado(boleta.estadoBoleta);
+  const proximoEstado = siguienteEstadoAdmin(boleta.estadoBoleta);
   const esUltimoEstado = ORDEN_ESTADOS_BOLETA.indexOf(boleta.estadoBoleta) === ORDEN_ESTADOS_BOLETA.length - 1;
 
   return (
@@ -123,6 +168,25 @@ export default function BoletaDetallePage() {
           <Button variant="light" leftSection={<IconPrinter size={16} />} onClick={() => window.print()}>
             Imprimir
           </Button>
+          <Button
+            variant="light"
+            leftSection={<IconFileTypePdf size={16} />}
+            loading={descargando}
+            onClick={handleDescargarPdf}
+          >
+            Descargar PDF
+          </Button>
+          {boleta.telefonoEmpleado && (
+            <Button
+              variant="light"
+              color="teal"
+              leftSection={<IconBrandWhatsapp size={16} />}
+              loading={compartiendo}
+              onClick={handleEnviarWhatsapp}
+            >
+              Enviar por WhatsApp
+            </Button>
+          )}
           <Button
             variant="light"
             color="red"
@@ -166,8 +230,32 @@ export default function BoletaDetallePage() {
               Trabajador
             </Text>
             <Text fw={600}>{boleta.empleado ?? '—'}</Text>
+            <Text size="sm" c="dimmed" mt={4}>
+              DNI: {boleta.numeroDocumento ?? '—'} · Cargo: {boleta.cargo ?? '—'}
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Text size="sm" c="dimmed">
+              Datos previsionales y de abono
+            </Text>
+            <Text fw={600}>{boleta.nombreBanco ?? '—'}</Text>
+            <Text size="sm" c="dimmed" mt={4}>
+              Cuenta: {boleta.numeroCuentaBanco ?? '—'} · AFP/Pensión: {boleta.nombreSistemaPension ?? '—'}
+            </Text>
           </Grid.Col>
         </Grid>
+
+        {(boleta.diasVacacionesGozadas > 0 || Number(boleta.horasExtras25) > 0 || Number(boleta.horasExtras35) > 0) && (
+          <Text size="sm" c="dimmed" mb="sm">
+            {formatearVacacionesGozadas(
+              boleta.diasVacacionesGozadas,
+              boleta.vacacionesFechaInicio,
+              boleta.vacacionesFechaFin,
+            )}{' '}
+            {Number(boleta.horasExtras25) > 0 && `Horas extra 25%: ${boleta.horasExtras25}h. `}
+            {Number(boleta.horasExtras35) > 0 && `Horas extra 35%: ${boleta.horasExtras35}h.`}
+          </Text>
+        )}
 
         <Table withTableBorder verticalSpacing="sm">
           <Table.Thead>
@@ -178,12 +266,46 @@ export default function BoletaDetallePage() {
           </Table.Thead>
           <Table.Tbody>
             <Table.Tr>
-              <Table.Td>Ingresos (sueldo bruto)</Table.Td>
+              <Table.Td fw={600}>Sueldo base</Table.Td>
               <Table.Td ta="right">{formatearMoneda(boleta.sueldoBruto)}</Table.Td>
             </Table.Tr>
+            {(boleta.movimientos ?? [])
+              .filter((m) => m.tipoConcepto === 'INGRESO')
+              .map((m, i) => (
+                <Table.Tr key={`ing-${i}`}>
+                  <Table.Td>{m.nombreConcepto}</Table.Td>
+                  <Table.Td ta="right" c="green">
+                    +{formatearMoneda(m.monto)}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            {(boleta.movimientos ?? [])
+              .filter((m) => m.tipoConcepto === 'DESCUENTO')
+              .map((m, i) => (
+                <Table.Tr key={`desc-${i}`}>
+                  <Table.Td>{m.nombreConcepto}</Table.Td>
+                  <Table.Td ta="right" c="red">
+                    -{formatearMoneda(m.monto)}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            {(boleta.movimientos ?? [])
+              .filter((m) => m.tipoConcepto === 'APORTE_EMPLEADOR')
+              .map((m, i) => (
+                <Table.Tr key={`ap-${i}`}>
+                  <Table.Td>
+                    <Text span c="dimmed">
+                      {m.nombreConcepto} (aporte del empleador)
+                    </Text>
+                  </Table.Td>
+                  <Table.Td ta="right" c="dimmed">
+                    {formatearMoneda(m.monto)}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
             <Table.Tr>
-              <Table.Td>Total descuentos</Table.Td>
-              <Table.Td ta="right" c="red">
+              <Table.Td fw={600}>Total descuentos</Table.Td>
+              <Table.Td ta="right" c="red" fw={600}>
                 -{formatearMoneda(boleta.totalDescuento)}
               </Table.Td>
             </Table.Tr>

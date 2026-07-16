@@ -38,6 +38,7 @@ const VALORES_INICIALES = {
   estadoCivil: '',
   nacionalidad: 'Peruana',
   correo: '',
+  telefono: '',
   direccionCompleta: '',
   distrito: '',
   provincia: '',
@@ -110,6 +111,7 @@ export default function EmpleadoFormPage() {
             estadoCivil: empleado.estadoCivil ?? '',
             nacionalidad: empleado.nacionalidad ?? '',
             correo: empleado.correo ?? '',
+            telefono: empleado.telefono ?? '',
             direccionCompleta: empleado.direccionCompleta ?? '',
             distrito: empleado.distrito ?? '',
             provincia: empleado.provincia ?? '',
@@ -151,6 +153,7 @@ export default function EmpleadoFormPage() {
       estadoCivil: values.estadoCivil,
       nacionalidad: values.nacionalidad || null,
       correo: values.correo || null,
+      telefono: values.telefono || null,
       direccionCompleta: values.direccionCompleta || null,
       distrito: values.distrito || null,
       provincia: values.provincia || null,
@@ -256,6 +259,12 @@ export default function EmpleadoFormPage() {
             </Title>
             <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
               <TextInput name="correo" label="Correo" {...form.getInputProps('correo')} />
+              <TextInput
+                name="telefono"
+                label="Teléfono"
+                description="Usado para el botón de WhatsApp en las boletas"
+                {...form.getInputProps('telefono')}
+              />
               <TextInput name="direccionCompleta" label="Dirección" {...form.getInputProps('direccionCompleta')} />
               <TextInput name="distrito" label="Distrito" {...form.getInputProps('distrito')} />
               <TextInput name="provincia" label="Provincia" {...form.getInputProps('provincia')} />

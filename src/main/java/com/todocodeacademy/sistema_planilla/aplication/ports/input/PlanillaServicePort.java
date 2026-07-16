@@ -1,5 +1,8 @@
 package com.todocodeacademy.sistema_planilla.aplication.ports.input;
 
+import com.todocodeacademy.sistema_planilla.aplication.command.DetalleMensualCommand;
+import com.todocodeacademy.sistema_planilla.domain.model.AuditoriaCambio;
+import com.todocodeacademy.sistema_planilla.domain.model.DetallePlanilla;
 import com.todocodeacademy.sistema_planilla.domain.model.Enum.TipoPlanilla;
 import com.todocodeacademy.sistema_planilla.domain.model.Planilla;
 
@@ -57,4 +60,35 @@ public interface PlanillaServicePort {
     Planilla abrirPlanilla(Long idPlanilla);
 
     Planilla obtenerPlanillaCompleta(Long idPlanilla);
+
+    // =========================
+    // DETALLE MENSUAL (HU-031 a HU-045)
+    // =========================
+
+    DetallePlanilla previsualizarDetalleMensual(
+            Long idPlanilla,
+            Long idDetalle,
+            DetalleMensualCommand command
+    );
+
+    DetallePlanilla actualizarDetalleMensual(
+            Long idPlanilla,
+            Long idDetalle,
+            DetalleMensualCommand command,
+            String usuario
+    );
+
+    byte[] exportarExcel(Long idPlanilla);
+
+    // =========================
+    // RESUMEN MENSUAL (HU-015)
+    // =========================
+
+    List<com.todocodeacademy.sistema_planilla.aplication.command.ResumenMensual> resumenMensual(int ultimosMeses);
+
+    // =========================
+    // AUDITORÍA (HU-012)
+    // =========================
+
+    List<AuditoriaCambio> obtenerAuditoria(Long idPlanilla);
 }

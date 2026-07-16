@@ -1,6 +1,10 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.input.mapper;
 
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpleadoRepositoryPort;
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpresaRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.RoleRepositoryPort;
+import com.todocodeacademy.sistema_planilla.domain.model.Empleado;
+import com.todocodeacademy.sistema_planilla.domain.model.Empresa;
 import com.todocodeacademy.sistema_planilla.domain.model.Role;
 import com.todocodeacademy.sistema_planilla.domain.model.UsuarioSec;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request.CreateUsuarioRequest;
@@ -17,6 +21,8 @@ import java.util.stream.Collectors;
 public class UsuarioMapper {
 
     private final RoleRepositoryPort roleRepository;
+    private final EmpleadoRepositoryPort empleadoRepository;
+    private final EmpresaRepositoryPort empresaRepository;
 
     public UsuarioSec toDomain(CreateUsuarioRequest request) {
 
@@ -36,6 +42,22 @@ public class UsuarioMapper {
 
                 usuario.agregarRol(role);
             }
+        }
+
+        if (request.getEmpleadoId() != null) {
+            Empleado empleado = empleadoRepository.findById(request.getEmpleadoId())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Empleado no encontrado: " + request.getEmpleadoId()));
+
+            usuario.asignarEmpleado(empleado);
+        }
+
+        if (request.getEmpresaId() != null) {
+            Empresa empresa = empresaRepository.findById(request.getEmpresaId())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Empresa no encontrada: " + request.getEmpresaId()));
+
+            usuario.asignarEmpresa(empresa);
         }
 
         return usuario;

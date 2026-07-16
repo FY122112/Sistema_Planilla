@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import {
   ActionIcon,
+  Alert,
   Badge,
   Button,
   Group,
   Modal,
   NumberInput,
+  Paper,
   Select,
   Table,
   Text,
   Title,
   Tooltip,
 } from '@mantine/core';
+import { BarChart } from '@mantine/charts';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -20,6 +23,7 @@ import {
   IconEye,
   IconLock,
   IconLockOpen,
+  IconMessageReport,
   IconPlus,
   IconTrash,
 } from '@tabler/icons-react';
@@ -28,15 +32,20 @@ import {
   cerrarPlanilla,
   deletePlanilla,
   fetchPlanillas,
+  fetchResumenMensual,
   generarPlanilla,
 } from '../api/planillas';
+import { fetchSolicitudesPendientesCount } from '../api/solicitudesAjuste';
 import {
   MESES,
   TIPO_PLANILLA_GENERABLE_OPTIONS,
+  formatearMoneda,
   nombreMes,
   nombreTipoPlanilla,
 } from '../constants/planilla';
 import ConfirmModal from '../components/ConfirmModal';
+
+const MES_ABREVIADO = MESES.map((m) => m.label.slice(0, 3));
 
 export default function PlanillasPage() {
   const navigate = useNavigate();
@@ -47,6 +56,9 @@ export default function PlanillasPage() {
   const [togglingId, setTogglingId] = useState(null);
   const [toDelete, setToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [resumen, setResumen] = useState([]);
+  const [loadingResumen, setLoadingResumen] = useState(true);
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState(0);
 
   const currentYear = new Date().getFullYear();
 
@@ -79,6 +91,29 @@ export default function PlanillasPage() {
 
   useEffect(() => {
     loadData();
+
+    fetchSolicitudesPendientesCount()
+      .then(setSolicitudesPendientes)
+      .catch(() => {});
+
+    setLoadingResumen(true);
+    fetchResumenMensual(12)
+      .then((data) =>
+        setResumen(
+          data.map((item) => ({
+            periodo: `${MES_ABREVIADO[item.mes - 1]} ${item.anio}`,
+            totalNeto: Number(item.totalNeto ?? 0),
+          })),
+        ),
+      )
+      .catch(() => {
+        notifications.show({
+          color: 'red',
+          title: 'Error',
+          message: 'No se pudo cargar el histórico de gastos salariales',
+        });
+      })
+      .finally(() => setLoadingResumen(false));
   }, []);
 
   const handleGenerar = async (values) => {
@@ -148,6 +183,40 @@ export default function PlanillasPage() {
           Generar planilla
         </Button>
       </Group>
+
+      {solicitudesPendientes > 0 && (
+        <Alert
+          color="orange"
+          title="Solicitudes de ajuste pendientes"
+          icon={<IconMessageReport size={18} />}
+          mb="lg"
+          onClick={() => navigate('/solicitudes-ajuste')}
+          style={{ cursor: 'pointer' }}
+        >
+          Hay {solicitudesPendientes} solicitud(es) de empleados esperando revisión. Haz clic para verlas.
+        </Alert>
+      )}
+
+      <Paper withBorder p="md" mb="lg">
+        <Text fw={500} mb="sm">
+          Histórico de gastos salariales
+        </Text>
+        {!loadingResumen && resumen.length === 0 ? (
+          <Text size="sm" c="dimmed">
+            Todavía no hay planillas generadas para mostrar el histórico
+          </Text>
+        ) : (
+          <BarChart
+            h={260}
+            data={resumen}
+            dataKey="periodo"
+            series={[{ name: 'totalNeto', label: 'Total neto', color: 'blue.6' }]}
+            valueFormatter={formatearMoneda}
+            withLegend={false}
+            gridAxis="y"
+          />
+        )}
+      </Paper>
 
       <Table striped highlightOnHover withTableBorder verticalSpacing="sm">
         <Table.Thead>

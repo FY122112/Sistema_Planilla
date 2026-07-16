@@ -1,5 +1,6 @@
 package com.todocodeacademy.sistema_planilla.aplication.service;
 
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.ConceptoPagoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpleadoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ParametroLegalRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.PlanillaRepositoryPort;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 /**
@@ -44,6 +46,9 @@ class PlanillaServiceTest {
 
     @Mock
     private ParametroLegalRepositoryPort parametroRepo;
+
+    @Mock
+    private ConceptoPagoRepositoryPort conceptoPagoRepo;
 
     @InjectMocks
     private PlanillaService planillaService;
@@ -110,6 +115,17 @@ class PlanillaServiceTest {
                         new BigDecimal("113.00"), LocalDate.of(2024, 5, 1), null
                 )));
         when(planillaRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        stubCatalogoConceptos();
+    }
+
+    // El catálogo de ConceptoPago siempre empieza "vacío" en estos tests: cada concepto
+    // se resuelve por nombre (no existe todavía) y se guarda la primera vez que se usa.
+    private void stubCatalogoConceptos() {
+        // lenient: CTS/Liquidación no crean ningún ConceptoPago (son inafectas a AFP/ONP),
+        // así que este stub queda sin usar en esos tests y Mockito lo marcaría como
+        // "unnecessary" en modo estricto.
+        lenient().when(conceptoPagoRepo.findByNombreConcepto(any())).thenReturn(Optional.empty());
+        lenient().when(conceptoPagoRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     @Test
@@ -129,6 +145,7 @@ class PlanillaServiceTest {
                         new BigDecimal("113.00"), LocalDate.of(2024, 5, 1), null
                 )));
         when(planillaRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        stubCatalogoConceptos();
 
         Planilla planilla = planillaService.generarPlanilla(7, 2026, TipoPlanilla.MENSUAL);
 
@@ -138,8 +155,10 @@ class PlanillaServiceTest {
         assertThat(detalle.getSueldoBase()).isEqualByComparingTo("3000.00");
         assertThat(detalle.getAsignacionFamiliar()).isEqualByComparingTo("113.00");
         assertThat(detalle.getSueldoBruto()).isEqualByComparingTo("3113.00");
-        assertThat(detalle.getTotalDescuento()).isEqualByComparingTo("390.00");
-        assertThat(detalle.getSueldoNeto()).isEqualByComparingTo("2723.00");
+        // El descuento AFP/ONP ahora se calcula sobre la remuneración computable completa
+        // (sueldoBase + asignación familiar), no solo sobre sueldoBase: 3113.00 * 13% = 404.69.
+        assertThat(detalle.getTotalDescuento()).isEqualByComparingTo("404.69");
+        assertThat(detalle.getSueldoNeto()).isEqualByComparingTo("2708.31");
     }
 
     @Test

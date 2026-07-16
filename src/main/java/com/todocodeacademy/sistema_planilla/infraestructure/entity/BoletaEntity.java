@@ -58,6 +58,9 @@ public class BoletaEntity {
     @Column(nullable = false)
     EstadoBoleta estadoBoleta;
 
+    @Column(name = "fecha_firma")
+    Instant fechaFirma;
+
     @CreationTimestamp
     @Column(name="created_at", nullable = false, updatable = false)
     Instant createdAt;

@@ -23,3 +23,25 @@ export function updateBoleta(id, { estadoBoleta, rutaPdf, sueldoBruto, totalDesc
 export function deleteBoleta(id) {
   return client.delete(`/api/boletas/${id}`);
 }
+
+export function descargarBoletaPdf(id) {
+  return client.get(`/api/boletas/${id}/pdf`, { responseType: 'blob' }).then((res) => res.data);
+}
+
+export function fetchMisBoletas() {
+  return client.get('/api/boletas/me').then((res) => res.data);
+}
+
+export function firmarBoleta(id) {
+  return client.patch(`/api/boletas/${id}/firmar`).then((res) => res.data);
+}
+
+export function descargarBoletasZip(mes, anio) {
+  return client
+    .get('/api/boletas/zip', { params: { mes, anio }, responseType: 'blob' })
+    .then((res) => res.data);
+}
+
+export function crearEnlaceCompartidoBoleta(id) {
+  return client.post(`/api/boletas/${id}/compartir`).then((res) => res.data);
+}

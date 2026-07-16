@@ -21,8 +21,9 @@ export default function LoginPage() {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      await login(values.username, values.password);
-      navigate('/planillas', { replace: true });
+      const roles = await login(values.username, values.password);
+      const destino = roles.includes('ADMINISTRADOR') ? '/planillas' : '/mi-portal';
+      navigate(destino, { replace: true });
     } catch (error) {
       const message =
         error.response?.data?.message || 'Usuario o contraseña incorrectos';

@@ -6,6 +6,7 @@ import { Notifications } from '@mantine/notifications';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import '@mantine/charts/styles.css';
 import 'mantine-datatable/styles.css';
 import './index.css';
 

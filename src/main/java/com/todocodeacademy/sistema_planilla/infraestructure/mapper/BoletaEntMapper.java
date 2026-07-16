@@ -38,6 +38,15 @@ public class BoletaEntMapper {
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
                     BigDecimal.ZERO,
+                    0,
+                    0,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
+                    0,
+                    null,
+                    null,
+                    BigDecimal.ZERO,
+                    BigDecimal.ZERO,
                     null,
                     null,
                     null,
@@ -56,6 +65,7 @@ public class BoletaEntMapper {
                 entity.getSueldoNeto(),
                 entity.getRutaPdf(),
                 entity.getEstadoBoleta(),
+                entity.getFechaFirma(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
         );
@@ -89,6 +99,7 @@ public class BoletaEntMapper {
         entity.setSueldoNeto(domain.getSueldoNeto());
         entity.setRutaPdf(domain.getRutaPdf());
         entity.setEstadoBoleta(domain.getEstadoBoleta());
+        entity.setFechaFirma(domain.getFechaFirma());
 
         // created_at es updatable=false (Hibernate lo ignora en el UPDATE), pero si no
         // se copia aquí la entidad recién construida para el merge queda con createdAt en

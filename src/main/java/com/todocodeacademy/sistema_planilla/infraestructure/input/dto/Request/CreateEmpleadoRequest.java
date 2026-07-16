@@ -36,6 +36,8 @@ public record CreateEmpleadoRequest(
         @Email
         String correo,
 
+        String telefono,
+
         String direccionCompleta,
         String distrito,
         String provincia,

@@ -1,6 +1,13 @@
 import { AppShell, Burger, Group, NavLink, Text, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconUsers, IconUserCog, IconLogout, IconReportMoney, IconReceipt } from '@tabler/icons-react';
+import {
+  IconUsers,
+  IconUserCog,
+  IconLogout,
+  IconReportMoney,
+  IconReceipt,
+  IconMessageReport,
+} from '@tabler/icons-react';
 import { NavLink as RouterNavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
@@ -8,6 +15,7 @@ const NAV_ITEMS = [
   { label: 'Planillas', to: '/planillas', icon: IconReportMoney },
   { label: 'Boletas', to: '/boletas', icon: IconReceipt },
   { label: 'Empleados', to: '/empleados', icon: IconUsers },
+  { label: 'Solicitudes de Ajuste', to: '/solicitudes-ajuste', icon: IconMessageReport, adminOnly: true },
   { label: 'Usuarios', to: '/usuarios', icon: IconUserCog, adminOnly: true },
 ];
 

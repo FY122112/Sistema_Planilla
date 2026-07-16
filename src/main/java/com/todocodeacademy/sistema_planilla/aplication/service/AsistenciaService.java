@@ -166,4 +166,21 @@ public class AsistenciaService implements AsistenciaServicePort {
     public void deleteById(Long id) {
         asisRepo.deleteById(id);
     }
+
+    @Override
+    public List<Long> idsEmpleadosSinAsistencia(List<Long> idsEmpleados, Integer mes, Integer anio) {
+
+        if (idsEmpleados == null || idsEmpleados.isEmpty()) {
+            return List.of();
+        }
+
+        LocalDate inicio = LocalDate.of(anio, mes, 1);
+        LocalDate fin = inicio.withDayOfMonth(inicio.lengthOfMonth());
+
+        List<Long> idsConAsistencia = asisRepo.findIdsEmpleadosConAsistencia(idsEmpleados, inicio, fin);
+
+        return idsEmpleados.stream()
+                .filter(id -> !idsConAsistencia.contains(id))
+                .toList();
+    }
 }

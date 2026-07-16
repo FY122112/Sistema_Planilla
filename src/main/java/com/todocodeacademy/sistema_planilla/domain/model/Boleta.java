@@ -30,6 +30,8 @@ public class Boleta {
 
     EstadoBoleta estadoBoleta;
 
+    Instant fechaFirma;
+
     Instant createdAt;
     Instant updatedAt;
 
@@ -84,6 +86,7 @@ public class Boleta {
             BigDecimal sueldoNeto,
             String rutaPdf,
             EstadoBoleta estado,
+            Instant fechaFirma,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -105,6 +108,7 @@ public class Boleta {
 
         b.rutaPdf = rutaPdf;
         b.estadoBoleta = estado;
+        b.fechaFirma = fechaFirma;
 
         b.createdAt = createdAt;
         b.updatedAt = updatedAt;
@@ -137,6 +141,7 @@ public class Boleta {
 
     public void marcarComoFirmada() {
         this.estadoBoleta = EstadoBoleta.FIRMADA;
+        this.fechaFirma = Instant.now();
     }
 
     public void marcarComoEnviada() {

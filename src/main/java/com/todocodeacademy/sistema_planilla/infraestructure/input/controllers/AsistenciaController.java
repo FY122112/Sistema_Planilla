@@ -9,11 +9,15 @@ import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.A
 import com.todocodeacademy.sistema_planilla.infraestructure.input.mapper.AsistenciaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
+// Marcado de asistencia: dato administrativo/de RR.HH., exclusivo del Administrador por
+// ahora (no forma parte del portal de autoservicio del empleado).
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 @RestController
 @RequestMapping("/api/asistencia")
 @RequiredArgsConstructor
@@ -54,5 +58,19 @@ public class AsistenciaController {
 
         return  ResponseEntity.ok(mapper.toResponse(asistencia));
 
+    }
+
+    // Empleados sin ninguna marca de asistencia en el mes/año indicado, de entre los ids
+    // dados — usado por el frontend para el banner de "asistencia incompleta" (HU-008).
+    @GetMapping("/faltantes")
+    public ResponseEntity<List<Long>> idsEmpleadosSinAsistencia(
+            @RequestParam List<Long> idsEmpleados,
+            @RequestParam Integer mes,
+            @RequestParam Integer anio
+    ) {
+
+        return ResponseEntity.ok(
+                asiServ.idsEmpleadosSinAsistencia(idsEmpleados, mes, anio)
+        );
     }
 }

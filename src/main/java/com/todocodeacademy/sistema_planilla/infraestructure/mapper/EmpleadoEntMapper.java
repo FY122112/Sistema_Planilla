@@ -34,6 +34,7 @@ public class EmpleadoEntMapper {
                 entity.getEstadoCivil(),
                 entity.getNacionalidad(),
                 entity.getCorreo(),
+                entity.getTelefono(),
                 entity.getDireccionCompleta(),
                 entity.getDistrito(),
                 entity.getProvincia(),
@@ -61,7 +62,8 @@ public class EmpleadoEntMapper {
                 entity.getNombreAfp(),
                 entity.getNumeroCuentaBanco(),
                 entity.getCreatedAt(),
-                entity.getUpdatedAt()
+                entity.getUpdatedAt(),
+                entity.isEliminado()
         );
     }
 
@@ -90,6 +92,7 @@ public class EmpleadoEntMapper {
 
         entity.setNacionalidad(domain.getNacionalidad());
         entity.setCorreo(domain.getCorreo());
+        entity.setTelefono(domain.getTelefono());
 
         entity.setDireccionCompleta(domain.getDireccionCompleta());
         entity.setDistrito(domain.getDistrito());
@@ -99,6 +102,7 @@ public class EmpleadoEntMapper {
         entity.setFechaIngreso(domain.getFechaIngreso());
         entity.setEstado(domain.estaActivo());
         entity.setFechaCese(domain.getFechaCese());
+        entity.setEliminado(domain.isEliminado());
 
         // MAPEAR COMPLETO
         if (domain.getPuesto() != null) {

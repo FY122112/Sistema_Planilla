@@ -24,4 +24,8 @@ public interface BoletaRepositoryPort {
 
     List<Boleta> getBoletasByEstadoBoleta(EstadoBoleta estadoBoleta);
 
+    List<Boleta> findByEmpleadoId(Long idEmpleado);
+
+    List<Boleta> findByPeriodo(Integer periodoMes, Integer periodoAnio);
+
 }

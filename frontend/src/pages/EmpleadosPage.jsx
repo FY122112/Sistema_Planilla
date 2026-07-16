@@ -1,10 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActionIcon, Badge, Button, Group, Text, TextInput, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Badge,
+  Button,
+  FileInput,
+  Group,
+  Modal,
+  Table,
+  Text,
+  TextInput,
+  Title,
+  Tooltip,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { DataTable } from 'mantine-datatable';
-import { IconEdit, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconFileUpload, IconPlus, IconSearch, IconTrash } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useNavigate } from 'react-router-dom';
-import { deleteEmpleado, fetchEmpleados } from '../api/empleados';
+import { deleteEmpleado, fetchEmpleados, importarEmpleadosCsv } from '../api/empleados';
 import ConfirmModal from '../components/ConfirmModal';
 
 const PAGE_SIZE = 10;
@@ -17,6 +31,10 @@ export default function EmpleadosPage() {
   const [page, setPage] = useState(1);
   const [toDelete, setToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [importOpened, { open: openImport, close: closeImport }] = useDisclosure(false);
+  const [archivoCsv, setArchivoCsv] = useState(null);
+  const [importando, setImportando] = useState(false);
+  const [resultadoImport, setResultadoImport] = useState(null);
 
   const loadData = () => {
     setLoading(true);
@@ -65,6 +83,29 @@ export default function EmpleadosPage() {
     }
   };
 
+  const handleImportar = async () => {
+    if (!archivoCsv) return;
+    setImportando(true);
+    try {
+      const resultado = await importarEmpleadosCsv(archivoCsv);
+      setResultadoImport(resultado);
+      if (resultado.exitosos > 0) {
+        loadData();
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || 'No se pudo importar el archivo CSV';
+      notifications.show({ color: 'red', title: 'Error', message });
+    } finally {
+      setImportando(false);
+    }
+  };
+
+  const handleCloseImport = () => {
+    closeImport();
+    setArchivoCsv(null);
+    setResultadoImport(null);
+  };
+
   return (
     <>
       <Group justify="space-between" mb="md">
@@ -80,6 +121,9 @@ export default function EmpleadosPage() {
             }}
             w={280}
           />
+          <Button variant="default" leftSection={<IconFileUpload size={16} />} onClick={openImport}>
+            Importar CSV
+          </Button>
           <Button leftSection={<IconPlus size={16} />} onClick={() => navigate('/empleados/nuevo')}>
             Nuevo empleado
           </Button>
@@ -157,6 +201,69 @@ export default function EmpleadosPage() {
         onConfirm={handleDelete}
         onCancel={() => setToDelete(null)}
       />
+
+      <Modal opened={importOpened} onClose={handleCloseImport} title="Importar empleados por CSV" size="lg" centered>
+        <Text size="sm" c="dimmed" mb="sm">
+          Columnas esperadas (con encabezado): nombre, apellido, tipoDocumento, numeroDocumento,
+          fechaNacimiento (AAAA-MM-DD), sexo, estadoCivil, nacionalidad, correo, telefono,
+          fechaIngreso (AAAA-MM-DD), puesto, regimenLaboral, tieneHijosCalificados
+        </Text>
+
+        <FileInput
+          label="Archivo CSV"
+          placeholder="Selecciona un archivo .csv"
+          accept=".csv,text/csv"
+          value={archivoCsv}
+          onChange={setArchivoCsv}
+        />
+
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={handleCloseImport}>
+            {resultadoImport ? 'Cerrar' : 'Cancelar'}
+          </Button>
+          <Button onClick={handleImportar} loading={importando} disabled={!archivoCsv}>
+            Importar
+          </Button>
+        </Group>
+
+        {resultadoImport && (
+          <>
+            <Alert
+              color={resultadoImport.fallidos > 0 ? 'yellow' : 'green'}
+              title="Resultado de la importación"
+              mt="md"
+            >
+              {resultadoImport.totalFilas} fila(s) procesadas: {resultadoImport.exitosos} registrada(s)
+              correctamente, {resultadoImport.fallidos} con errores.
+            </Alert>
+
+            <Table striped withTableBorder mt="sm" fz="xs">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Fila</Table.Th>
+                  <Table.Th>Documento</Table.Th>
+                  <Table.Th>Estado</Table.Th>
+                  <Table.Th>Mensaje</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {resultadoImport.detalle.map((item) => (
+                  <Table.Tr key={item.fila}>
+                    <Table.Td>{item.fila}</Table.Td>
+                    <Table.Td>{item.numeroDocumento}</Table.Td>
+                    <Table.Td>
+                      <Badge color={item.exitoso ? 'green' : 'red'} size="sm">
+                        {item.exitoso ? 'OK' : 'Error'}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>{item.mensaje}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </>
+        )}
+      </Modal>
     </>
   );
 }

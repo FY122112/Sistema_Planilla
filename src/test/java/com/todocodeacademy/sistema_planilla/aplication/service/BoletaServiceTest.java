@@ -50,6 +50,7 @@ class BoletaServiceTest {
                 null,
                 EstadoBoleta.GENERADA,
                 null,
+                null,
                 null
         );
     }
@@ -63,7 +64,7 @@ class BoletaServiceTest {
         Boleta payload = Boleta.reconstruir(
                 null, null, null, null, null,
                 actual.getSueldoBruto(), actual.getTotalDescuento(), null,
-                null, estadoSolicitado, null, null
+                null, estadoSolicitado, null, null, null
         );
 
         Boleta resultado = boletaService.update(1L, payload);
@@ -79,7 +80,7 @@ class BoletaServiceTest {
         Boleta payload = Boleta.reconstruir(
                 null, null, null, null, null,
                 actual.getSueldoBruto(), actual.getTotalDescuento(), null,
-                "boletas/2026-07/emp1.pdf", EstadoBoleta.GENERADA, null, null
+                "boletas/2026-07/emp1.pdf", EstadoBoleta.GENERADA, null, null, null
         );
 
         Boleta resultado = boletaService.update(1L, payload);

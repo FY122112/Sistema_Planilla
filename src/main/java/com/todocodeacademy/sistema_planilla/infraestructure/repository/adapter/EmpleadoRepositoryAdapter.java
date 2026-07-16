@@ -33,7 +33,7 @@ public class EmpleadoRepositoryAdapter implements EmpleadoRepositoryPort {
 
     @Override
     public Optional<Empleado> findByNumeroDocumento(String numeroDocumento) {
-        return repository.findByNumeroDocumento(numeroDocumento)
+        return repository.findByNumeroDocumentoAndEliminadoFalse(numeroDocumento)
                 .map(mapper::toDomain);
     }
 

@@ -41,3 +41,19 @@ export function formatearMoneda(valor) {
   const numero = Number(valor ?? 0);
   return `S/ ${numero.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
+function formatearFecha(iso) {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('es-PE');
+}
+
+// HU-049: complementa el conteo de días de vacaciones con el rango de fechas real, cuando
+// el Contador lo registró (los detalles antiguos solo tienen el conteo, sin fechas).
+export function formatearVacacionesGozadas(dias, fechaInicio, fechaFin) {
+  if (!dias || dias <= 0) return null;
+
+  const rango = fechaInicio && fechaFin
+    ? ` (del ${formatearFecha(fechaInicio)} al ${formatearFecha(fechaFin)})`
+    : '';
+
+  return `Vacaciones gozadas: ${dias} día(s)${rango}.`;
+}

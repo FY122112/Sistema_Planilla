@@ -48,14 +48,19 @@ public class UserDetailsServiceImp implements UserDetailsService {
                         authorities.add(new SimpleGrantedAuthority(permission.getName()))
                 );
 
-        return new org.springframework.security.core.userdetails.User(
+        Long idEmpleado = userSec.getEmpleado() != null
+                ? userSec.getEmpleado().getIdEmpleado()
+                : null;
+
+        return new EmpleadoUserDetails(
                 userSec.getUsername(),
                 userSec.getPassword(),
                 userSec.isEnabled(),
                 userSec.isAccountNonExpired(),
                 userSec.isCredentialsNonExpired(),
                 userSec.isAccountNonLocked(),
-                authorities
+                authorities,
+                idEmpleado
         );
     }
 

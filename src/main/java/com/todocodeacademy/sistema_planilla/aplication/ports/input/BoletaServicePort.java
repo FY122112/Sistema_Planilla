@@ -16,4 +16,12 @@ public interface BoletaServicePort {
 
     void deleteById(Long id);
 
+    byte[] generarPdf(Long id);
+
+    List<Boleta> findByEmpleadoId(Long idEmpleado);
+
+    Boleta firmarComoEmpleado(Long idBoleta, Long idEmpleadoAutenticado);
+
+    byte[] exportarZip(Integer periodoMes, Integer periodoAnio);
+
 }

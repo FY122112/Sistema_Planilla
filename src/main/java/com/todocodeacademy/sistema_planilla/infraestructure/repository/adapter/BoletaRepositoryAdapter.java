@@ -68,5 +68,21 @@ public class BoletaRepositoryAdapter implements BoletaRepositoryPort {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Boleta> findByEmpleadoId(Long idEmpleado) {
+        return repository.findByDetallePlanilla_Empleado_IdEmpleado(idEmpleado)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Boleta> findByPeriodo(Integer periodoMes, Integer periodoAnio) {
+        return repository.findByPeriodoMesAndPeriodoAnio(periodoMes, periodoAnio)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }
 

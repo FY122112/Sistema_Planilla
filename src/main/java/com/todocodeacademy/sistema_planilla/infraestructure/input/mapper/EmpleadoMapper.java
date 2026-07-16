@@ -60,6 +60,7 @@ public class EmpleadoMapper {
         );
 
         empleado.actualizarContacto(request.correo());
+        empleado.actualizarTelefono(request.telefono());
 
         empleado.actualizarDireccion(
                 request.direccionCompleta(),
@@ -121,6 +122,10 @@ public class EmpleadoMapper {
         // CONTACTO
         if (request.correo() != null) {
             actual.actualizarContacto(request.correo());
+        }
+
+        if (request.telefono() != null) {
+            actual.actualizarTelefono(request.telefono());
         }
 
         // DIRECCION
@@ -217,6 +222,7 @@ public class EmpleadoMapper {
                 empleado.getEstadoCivil(),
                 empleado.getNacionalidad(),
                 empleado.getCorreo(),
+                empleado.getTelefono(),
                 empleado.getDireccionCompleta(),
                 empleado.getDistrito(),
                 empleado.getProvincia(),

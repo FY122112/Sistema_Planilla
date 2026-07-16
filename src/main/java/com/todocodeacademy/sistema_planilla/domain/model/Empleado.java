@@ -38,6 +38,7 @@ public class Empleado {
 
     String nacionalidad;
     String correo;
+    String telefono;
 
     String direccionCompleta;
     String distrito;
@@ -52,6 +53,12 @@ public class Empleado {
 
     Boolean estado;
     LocalDate fechaCese;
+
+    // Distinto de "estado" (activo/cesado, un hecho laboral real): "eliminado" es una
+    // baja lógica administrativa para sacar de la lista maestra un registro erróneo
+    // (p. ej. un alta duplicada o mal tipeada) sin romper el historial de planillas/boletas
+    // que ya referencian este id (HU-029).
+    boolean eliminado;
 
     Puesto puesto;
 
@@ -132,6 +139,7 @@ public class Empleado {
             EstadoCivil estadoCivil,
             String nacionalidad,
             String correo,
+            String telefono,
             String direccionCompleta,
             String distrito,
             String provincia,
@@ -148,7 +156,8 @@ public class Empleado {
             String nombreAfp,
             String numeroCuentaBanco,
             Instant createdAt,
-            Instant updatedAt
+            Instant updatedAt,
+            Boolean eliminado
     ) {
 
         Empleado empleado = new Empleado(
@@ -160,6 +169,7 @@ public class Empleado {
         );
 
         empleado.idEmpleado = idEmpleado;
+        empleado.eliminado = Boolean.TRUE.equals(eliminado);
 
         empleado.tipoDocumento = tipoDocumento;
         empleado.fechaNacimiento = fechaNacimiento;
@@ -168,6 +178,7 @@ public class Empleado {
 
         empleado.nacionalidad = nacionalidad;
         empleado.correo = correo;
+        empleado.telefono = telefono;
 
         empleado.direccionCompleta = direccionCompleta;
         empleado.distrito = distrito;
@@ -219,6 +230,15 @@ public class Empleado {
 
     public boolean estaActivo() {
         return Boolean.TRUE.equals(this.estado);
+    }
+
+    public void eliminarLogicamente() {
+
+        if (this.eliminado) {
+            throw new IllegalStateException("El empleado ya fue eliminado de la lista maestra");
+        }
+
+        this.eliminado = true;
     }
 
     public String getNombreCompleto() {
@@ -277,6 +297,10 @@ public class Empleado {
 
     public void actualizarContacto(String correo) {
         this.correo = correo;
+    }
+
+    public void actualizarTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     public void actualizarDireccion(

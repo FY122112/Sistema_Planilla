@@ -1,8 +1,10 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.input.mapper;
 
 import com.todocodeacademy.sistema_planilla.domain.model.DetallePlanilla;
+import com.todocodeacademy.sistema_planilla.domain.model.MovimientoPlanilla;
 import com.todocodeacademy.sistema_planilla.domain.model.Planilla;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.DetallePlanillaResponseDTO;
+import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.MovimientoResponseDTO;
 import com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response.PlanillaResponseDTO;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +34,7 @@ public class PlanillaMapper {
                 .build();
     }
 
-    private DetallePlanillaResponseDTO toDetalleResponse(
+    public DetallePlanillaResponseDTO toDetalleResponse(
             DetallePlanilla detalle
     ) {
 
@@ -52,7 +54,35 @@ public class PlanillaMapper {
                 .totalDescuento(
                         detalle.getTotalDescuento()
                 )
+                .totalAportesEmpleador(
+                        detalle.getTotalAportesEmpleador()
+                )
                 .sueldoNeto(detalle.getSueldoNeto())
+                .diasNoLaborados(detalle.getDiasNoLaborados())
+                .minutosTardanza(detalle.getMinutosTardanza())
+                .horasExtras25(detalle.getHorasExtras25())
+                .horasExtras35(detalle.getHorasExtras35())
+                .diasVacacionesGozadas(detalle.getDiasVacacionesGozadas())
+                .vacacionesFechaInicio(detalle.getVacacionesFechaInicio())
+                .vacacionesFechaFin(detalle.getVacacionesFechaFin())
+                .bonificacionEficiencia(detalle.getBonificacionEficiencia())
+                .comisionComercial(detalle.getComisionComercial())
+                .movimientos(
+                        detalle.obtenerMovimientos()
+                                .stream()
+                                .map(this::toMovimientoResponse)
+                                .collect(Collectors.toList())
+                )
+                .build();
+    }
+
+    private MovimientoResponseDTO toMovimientoResponse(MovimientoPlanilla movimiento) {
+
+        return MovimientoResponseDTO.builder()
+                .codigo(movimiento.getConcepto().getCodigoSunat())
+                .nombreConcepto(movimiento.getConcepto().getNombreConcepto())
+                .tipoConcepto(movimiento.getConcepto().getTipoConcepto())
+                .monto(movimiento.getMonto())
                 .build();
     }
 }

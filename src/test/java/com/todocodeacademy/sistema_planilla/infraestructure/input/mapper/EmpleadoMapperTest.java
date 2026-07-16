@@ -56,7 +56,7 @@ class EmpleadoMapperTest {
     private UpdateEmpleadoRequest requestConSoloTieneHijosCalificados(boolean valor) {
         return new UpdateEmpleadoRequest(
                 null, null, null, null, null, null, null,
-                null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
                 null, null, null,
                 null,
                 null, valor,

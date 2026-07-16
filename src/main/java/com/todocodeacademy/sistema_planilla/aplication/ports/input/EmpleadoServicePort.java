@@ -1,5 +1,7 @@
 package com.todocodeacademy.sistema_planilla.aplication.ports.input;
 
+import com.todocodeacademy.sistema_planilla.aplication.command.EmpleadoImportRow;
+import com.todocodeacademy.sistema_planilla.aplication.command.ImportacionEmpleadosResumen;
 import com.todocodeacademy.sistema_planilla.domain.model.Empleado;
 
 import java.util.List;
@@ -21,5 +23,11 @@ public interface EmpleadoServicePort {
     List<Empleado> findByTieneHijosCalificados(Boolean tieneHijosCalificados);
 
     List<Empleado> searchByDniOrNameOrLastName(String query);
+
+    // =========================
+    // IMPORTACIÓN MASIVA (HU-028)
+    // =========================
+
+    ImportacionEmpleadosResumen importarCsv(List<EmpleadoImportRow> filas);
 
 }

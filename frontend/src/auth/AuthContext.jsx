@@ -18,6 +18,10 @@ export function AuthProvider({ children }) {
     localStorage.setItem('username', data.userName);
     setToken(data.jwt);
     setUsername(data.userName);
+
+    // Se devuelven los roles recién decodificados del JWT (no los del state, que todavía
+    // no se actualizó) para que LoginPage pueda decidir el redirect sin esperar un re-render.
+    return rolesFromToken(data.jwt);
   }, []);
 
   const logout = useCallback(() => {
@@ -34,6 +38,7 @@ export function AuthProvider({ children }) {
     username,
     roles,
     isAdmin: roles.includes('ADMINISTRADOR'),
+    isEmpleado: roles.includes('EMPLEADO'),
     isAuthenticated: Boolean(token),
     login,
     logout,
