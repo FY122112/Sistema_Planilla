@@ -67,7 +67,7 @@ export default function SolicitudesAjustePage() {
                 {nombreMes(s.periodoMes)} {s.periodoAnio}
               </Table.Td>
               <Table.Td maw={400}>{s.mensaje}</Table.Td>
-              <Table.Td>
+              <Table.Td miw={110}>
                 <Badge color={s.estado === 'PENDIENTE' ? 'yellow' : 'green'}>
                   {s.estado === 'PENDIENTE' ? 'Pendiente' : 'Atendida'}
                 </Badge>
