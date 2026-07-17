@@ -170,8 +170,13 @@ public class PlanillaService implements PlanillaServicePort {
         // OBTENER EMPLEADOS ACTIVOS
         // =========================
 
+        // eliminado=true es una baja lógica administrativa (alta duplicada/errónea, ver
+        // Empleado#eliminarLogicamente): nunca debe generar planilla nueva, aunque su
+        // "estado" siga en true.
         List<Empleado> empleados =
-                empleadoRepo.findByEstado(true);
+                empleadoRepo.findByEstado(true).stream()
+                        .filter(e -> !e.isEliminado())
+                        .toList();
 
         if (empleados.isEmpty()) {
 
