@@ -1,5 +1,6 @@
 package com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,8 +20,10 @@ public class AsistenciaResponseDTO {
 
     private LocalDate fecha;
 
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime horaEntrada;
 
+    @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime horaSalida;
 
     private Integer minutosTardanzas;
