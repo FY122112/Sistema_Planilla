@@ -191,12 +191,19 @@ public class BoletaController {
     // =========================
     // PORTAL DE AUTOSERVICIO DEL EMPLEADO
     // =========================
+    //
+    // El acceso ya no depende del nombre del rol (antes exigía hasRole('EMPLEADO')):
+    // cualquier cuenta, sea cual sea su rol (Gerente General, QA, Administrador, etc.),
+    // ve su propia boleta siempre que esté vinculada a un Empleado (idEmpleado en el JWT).
 
-    @PreAuthorize("hasRole('EMPLEADO')")
     @GetMapping("/me")
     public ResponseEntity<List<BoletaResponseDTO>> misBoletas(Authentication authentication) {
 
         Long idEmpleado = idEmpleadoDelPrincipal(authentication);
+
+        if (idEmpleado == null) {
+            throw new AccessDeniedException("Esta cuenta no está vinculada a un empleado");
+        }
 
         return ResponseEntity.ok(
                 service.findByEmpleadoId(idEmpleado)
@@ -206,7 +213,6 @@ public class BoletaController {
         );
     }
 
-    @PreAuthorize("hasRole('EMPLEADO')")
     @PatchMapping("/{id}/firmar")
     public ResponseEntity<BoletaResponseDTO> firmar(
             @PathVariable Long id,
@@ -214,6 +220,10 @@ public class BoletaController {
     ) {
 
         Long idEmpleado = idEmpleadoDelPrincipal(authentication);
+
+        if (idEmpleado == null) {
+            throw new AccessDeniedException("Esta cuenta no está vinculada a un empleado");
+        }
 
         return ResponseEntity.ok(
                 mapper.toResponse(service.firmarComoEmpleado(id, idEmpleado))

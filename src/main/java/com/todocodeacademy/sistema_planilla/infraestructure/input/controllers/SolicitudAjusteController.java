@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,10 @@ public class SolicitudAjusteController {
     private final SolicitudAjusteServicePort service;
     private final SolicitudAjusteMapper mapper;
 
-    @PreAuthorize("hasRole('EMPLEADO')")
+    // El acceso ya no depende del nombre del rol (antes exigía hasRole('EMPLEADO')):
+    // cualquier cuenta vinculada a un Empleado (idEmpleado en el JWT) puede reportar
+    // y consultar sus propias solicitudes, sin importar su rol.
+
     @PostMapping
     public ResponseEntity<SolicitudAjusteResponseDTO> crear(
             @Valid @RequestBody CreateSolicitudAjusteRequest request,
@@ -33,16 +37,23 @@ public class SolicitudAjusteController {
 
         Long idEmpleado = idEmpleadoDelPrincipal(authentication);
 
+        if (idEmpleado == null) {
+            throw new AccessDeniedException("Esta cuenta no está vinculada a un empleado");
+        }
+
         var creada = service.crear(idEmpleado, request.idBoleta(), request.mensaje());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creada));
     }
 
-    @PreAuthorize("hasRole('EMPLEADO')")
     @GetMapping("/me")
     public ResponseEntity<List<SolicitudAjusteResponseDTO>> misSolicitudes(Authentication authentication) {
 
         Long idEmpleado = idEmpleadoDelPrincipal(authentication);
+
+        if (idEmpleado == null) {
+            throw new AccessDeniedException("Esta cuenta no está vinculada a un empleado");
+        }
 
         return ResponseEntity.ok(
                 service.findByEmpleadoId(idEmpleado)
