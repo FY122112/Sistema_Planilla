@@ -80,6 +80,13 @@ public class UsuarioSecService implements UsuarioSecServicePort {
             actual.asignarEmpleado(usuarioSec.getEmpleado());
         }
 
+        // roleIds ausente en el request -> reconstruir() deja un set vacío (no hay forma de
+        // distinguir "no vino" de "vino vacío" en este punto); se interpreta como "no tocar
+        // los roles", que además evita dejar la cuenta sin ningún rol.
+        if (usuarioSec.getRoles() != null && !usuarioSec.getRoles().isEmpty()) {
+            actual.actualizarRoles(usuarioSec.getRoles());
+        }
+
         return repository.save(actual);
     }
 

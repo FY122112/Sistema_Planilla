@@ -39,8 +39,10 @@ public class AsistenciaController {
 
     }
 
+    // @RequestParam en vez de @RequestBody: un GET con cuerpo lo descartan silenciosamente
+    // los navegadores (XHR/fetch no lo envían), así que el frontend nunca podría llamarlo.
     @GetMapping
-    public ResponseEntity<List<AsistenciaResponseDTO>> mostrarReporteDiario(@RequestBody LocalDate fecha){
+    public ResponseEntity<List<AsistenciaResponseDTO>> mostrarReporteDiario(@RequestParam LocalDate fecha){
 
         List<Asistencia> asistencias = asiServ.mostrarReporteDiario(fecha);
 

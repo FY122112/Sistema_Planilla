@@ -3,6 +3,8 @@ package com.todocodeacademy.sistema_planilla.infraestructure.input.dto.Request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 public class UpdateUsuarioRequest {
@@ -16,5 +18,9 @@ public class UpdateUsuarioRequest {
     private Boolean enabled;
 
     private Long empleadoId;
+
+    // null = no tocar los roles actuales; cualquier otro valor (incluyendo vacío) reemplaza
+    // el conjunto de roles por completo.
+    private Set<Long> roleIds;
 
 }

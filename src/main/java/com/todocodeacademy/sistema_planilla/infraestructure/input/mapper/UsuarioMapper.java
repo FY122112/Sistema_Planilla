@@ -72,6 +72,14 @@ public class UsuarioMapper {
                             new IllegalArgumentException("Empleado no encontrado: " + request.getEmpleadoId()));
         }
 
+        Set<Role> roles = null;
+        if (request.getRoleIds() != null) {
+            roles = request.getRoleIds().stream()
+                    .map(roleId -> roleRepository.findById(roleId)
+                            .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + roleId)))
+                    .collect(Collectors.toSet());
+        }
+
         return UsuarioSec.reconstruir(
                 null,
                 request.getUsername(),
@@ -86,7 +94,7 @@ public class UsuarioMapper {
                 null,
                 null,
                 null,
-                null
+                roles
         );
     }
 

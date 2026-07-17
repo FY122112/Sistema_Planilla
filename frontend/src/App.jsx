@@ -10,6 +10,9 @@ import LoginPage from './pages/LoginPage';
 import EmpleadosPage from './pages/EmpleadosPage';
 import EmpleadoFormPage from './pages/EmpleadoFormPage';
 import UsuariosPage from './pages/UsuariosPage';
+import PuestosPage from './pages/PuestosPage';
+import RolesPage from './pages/RolesPage';
+import AsistenciaPage from './pages/AsistenciaPage';
 import PlanillasPage from './pages/PlanillasPage';
 import PlanillaDetallePage from './pages/PlanillaDetallePage';
 import PlanillaDetalleEditarPage from './pages/PlanillaDetalleEditarPage';
@@ -35,6 +38,9 @@ export default function App() {
               <Route element={<AdminRoute />}>
                 <Route path="/usuarios" element={<UsuariosPage />} />
                 <Route path="/solicitudes-ajuste" element={<SolicitudesAjustePage />} />
+                <Route path="/puestos" element={<PuestosPage />} />
+                <Route path="/roles" element={<RolesPage />} />
+                <Route path="/asistencia" element={<AsistenciaPage />} />
               </Route>
 
               <Route path="/planillas" element={<PlanillasPage />} />

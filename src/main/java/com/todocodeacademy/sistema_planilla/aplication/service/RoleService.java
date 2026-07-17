@@ -36,6 +36,10 @@ public class RoleService implements RoleServicePort {
             update.actualizarDescription(role.getDescription());
         }
 
+        if (role.getPermissions() != null && !role.getPermissions().isEmpty()) {
+            update.actualizarPermisos(role.getPermissions());
+        }
+
         update =  roleServ.save(update);
         return update;
 

@@ -70,6 +70,10 @@ public class Role {
         this.permissions.remove(permission);
     }
 
+    public void actualizarPermisos(Set<Permission> permissions) {
+        this.permissions = permissions != null ? permissions : new HashSet<>();
+    }
+
     public boolean tienePermiso(String permiso) {
         return permissions.stream()
                 .anyMatch(p -> p.getName().equalsIgnoreCase(permiso));

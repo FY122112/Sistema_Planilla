@@ -7,6 +7,9 @@ import {
   IconReportMoney,
   IconReceipt,
   IconMessageReport,
+  IconBriefcase,
+  IconShieldLock,
+  IconClockHour4,
 } from '@tabler/icons-react';
 import { NavLink as RouterNavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
@@ -15,8 +18,11 @@ const NAV_ITEMS = [
   { label: 'Planillas', to: '/planillas', icon: IconReportMoney },
   { label: 'Boletas', to: '/boletas', icon: IconReceipt },
   { label: 'Empleados', to: '/empleados', icon: IconUsers },
+  { label: 'Asistencia', to: '/asistencia', icon: IconClockHour4, adminOnly: true },
   { label: 'Solicitudes de Ajuste', to: '/solicitudes-ajuste', icon: IconMessageReport, adminOnly: true },
   { label: 'Usuarios', to: '/usuarios', icon: IconUserCog, adminOnly: true },
+  { label: 'Puestos', to: '/puestos', icon: IconBriefcase, adminOnly: true },
+  { label: 'Roles', to: '/roles', icon: IconShieldLock, adminOnly: true },
 ];
 
 export default function AppLayout() {

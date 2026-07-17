@@ -44,15 +44,17 @@ export default function UsuariosPage() {
       password: (value) =>
         value.length < 8 ? 'La contraseña debe tener al menos 8 caracteres' : null,
       email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Correo inválido'),
+      roleIds: (value) => (value.length === 0 ? 'Selecciona al menos un rol' : null),
     },
   });
 
   const editForm = useForm({
-    initialValues: { username: '', email: '', password: '', empleadoId: '', enabled: true },
+    initialValues: { username: '', email: '', password: '', empleadoId: '', roleIds: [], enabled: true },
     validate: {
       username: (value) => (value.trim().length === 0 ? 'El usuario es obligatorio' : null),
       email: (value) => (/^\S+@\S+\.\S+$/.test(value) ? null : 'Correo inválido'),
       password: (value) => (value && value.length < 8 ? 'La contraseña debe tener al menos 8 caracteres' : null),
+      roleIds: (value) => (value.length === 0 ? 'Selecciona al menos un rol' : null),
     },
   });
 
@@ -123,11 +125,15 @@ export default function UsuariosPage() {
 
   const handleAbrirEdicion = (usuario) => {
     setEditando(usuario);
+    const roleIdsActuales = roles
+      .filter((role) => usuario.roles.includes(role.name))
+      .map((role) => String(role.idRole));
     editForm.setValues({
       username: usuario.username,
       email: usuario.email,
       password: '',
       empleadoId: usuario.empleadoId ? String(usuario.empleadoId) : '',
+      roleIds: roleIdsActuales,
       enabled: usuario.enabled,
     });
     openEdit();
@@ -141,6 +147,7 @@ export default function UsuariosPage() {
         email: values.email,
         password: values.password || undefined,
         empleadoId: values.empleadoId ? Number(values.empleadoId) : null,
+        roleIds: values.roleIds.map(Number),
         enabled: values.enabled,
       });
 
@@ -275,6 +282,7 @@ export default function UsuariosPage() {
             label="Roles"
             placeholder="Selecciona uno o más roles"
             data={roleOptions}
+            required
             mt="sm"
             {...form.getInputProps('roleIds')}
           />
@@ -331,6 +339,14 @@ export default function UsuariosPage() {
                 editForm.setFieldValue('email', empleado.correo);
               }
             }}
+          />
+          <MultiSelect
+            label="Roles"
+            placeholder="Selecciona uno o más roles"
+            data={roleOptions}
+            required
+            mt="sm"
+            {...editForm.getInputProps('roleIds')}
           />
           <Switch
             label="Usuario activo"

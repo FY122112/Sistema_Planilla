@@ -210,4 +210,13 @@ public class UsuarioSec {
 
         this.roles.remove(rol);
     }
+
+    public void actualizarRoles(Set<Role> roles) {
+
+        if (roles == null || roles.isEmpty()) {
+            throw new IllegalArgumentException("El usuario debe tener al menos un rol");
+        }
+
+        this.roles = roles;
+    }
 }
