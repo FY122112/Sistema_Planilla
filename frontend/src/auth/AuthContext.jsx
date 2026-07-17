@@ -37,8 +37,11 @@ export function AuthProvider({ children }) {
     token,
     username,
     roles,
+    // Solo ADMINISTRADOR tiene permisos de backend para las pantallas administrativas
+    // (@PreAuthorize en cada controlador); cualquier otro rol usa el portal de
+    // autoservicio, vea o no su boleta ahí depende de si tiene un Empleado vinculado,
+    // no del nombre del rol.
     isAdmin: roles.includes('ADMINISTRADOR'),
-    isEmpleado: roles.includes('EMPLEADO'),
     isAuthenticated: Boolean(token),
     login,
     logout,

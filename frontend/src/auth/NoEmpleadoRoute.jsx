@@ -3,13 +3,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { useAuth } from './AuthContext';
 
-// Bloquea la interfaz administrativa completa a cuentas de solo-empleado, aunque
-// naveguen la URL a mano — la restricción real está en el backend (@PreAuthorize en cada
-// controlador administrativo); esto evita además que la app intente renderizar pantallas
-// cuyos endpoints le van a devolver 403.
+// Bloquea la interfaz administrativa completa a cualquier cuenta que no sea
+// ADMINISTRADOR, aunque naveguen la URL a mano — la restricción real está en el backend
+// (@PreAuthorize en cada controlador administrativo, que hoy solo acepta ROLE_ADMINISTRADOR);
+// esto evita además que la app intente renderizar pantallas cuyos endpoints le van a
+// devolver 403.
 export default function NoEmpleadoRoute() {
-  const { isEmpleado, isAdmin } = useAuth();
-  const bloqueado = isEmpleado && !isAdmin;
+  const { isAdmin } = useAuth();
+  const bloqueado = !isAdmin;
 
   useEffect(() => {
     if (bloqueado) {

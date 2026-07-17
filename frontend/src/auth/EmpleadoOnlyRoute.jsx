@@ -4,19 +4,19 @@ import { notifications } from '@mantine/notifications';
 import { useAuth } from './AuthContext';
 
 export default function EmpleadoOnlyRoute() {
-  const { isEmpleado } = useAuth();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
-    if (!isEmpleado) {
+    if (isAdmin) {
       notifications.show({
         color: 'red',
         title: 'Acceso restringido',
-        message: 'Esta sección es solo para cuentas de empleado',
+        message: 'El portal de autoservicio es solo para cuentas no administradoras',
       });
     }
-  }, [isEmpleado]);
+  }, [isAdmin]);
 
-  if (!isEmpleado) {
+  if (isAdmin) {
     return <Navigate to="/planillas" replace />;
   }
 
