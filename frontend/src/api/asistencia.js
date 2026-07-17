@@ -19,3 +19,7 @@ export function fetchReporteDiario(fecha) {
 export function justificarAsistencia(id, motivo) {
   return client.put(`/api/asistencia/${id}`, { motivo }).then((res) => res.data);
 }
+
+export function marcarMiAsistencia(tipoMarca) {
+  return client.post('/api/asistencia/mi-marca', { tipoMarca }).then((res) => res.data);
+}

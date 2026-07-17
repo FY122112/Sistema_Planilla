@@ -10,6 +10,8 @@ public interface AsistenciaServicePort {
 
     Asistencia marcarAsistencia(MarcarAsistneciaCommand commnad);
 
+    Asistencia marcarAsistenciaPropia(Long idEmpleado, String tipoMarca);
+
     Asistencia justificarAsistencia(Long id,String motivo);
 
     List<Asistencia> mostrarReporteDiario(LocalDate fecha);

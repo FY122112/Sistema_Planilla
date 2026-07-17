@@ -74,6 +74,15 @@ public class AsistenciaService implements AsistenciaServicePort {
     }
 
     @Override
+    public Asistencia marcarAsistenciaPropia(Long idEmpleado, String tipoMarca) {
+
+        Empleado empleado = empleadoRepo.findById(idEmpleado)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+
+        return marcarAsistencia(new MarcarAsistneciaCommand(empleado.getNumeroDocumento(), tipoMarca));
+    }
+
+    @Override
     public Asistencia justificarAsistencia(Long id, String motivo) {
 
         Asistencia asistencia = asisRepo.findById(id).orElseThrow(()-> new RuntimeException("Asistencia no encontrado") );

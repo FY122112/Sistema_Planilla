@@ -20,6 +20,7 @@ import BoletasPage from './pages/BoletasPage';
 import BoletaDetallePage from './pages/BoletaDetallePage';
 import MiPortalPage from './pages/MiPortalPage';
 import MiBoletaDetallePage from './pages/MiBoletaDetallePage';
+import MiAsistenciaPage from './pages/MiAsistenciaPage';
 import SolicitudesAjustePage from './pages/SolicitudesAjustePage';
 
 export default function App() {
@@ -56,6 +57,7 @@ export default function App() {
             <Route element={<EmpleadoLayout />}>
               <Route path="/mi-portal" element={<MiPortalPage />} />
               <Route path="/mi-portal/boletas/:id" element={<MiBoletaDetallePage />} />
+              <Route path="/mi-portal/asistencia" element={<MiAsistenciaPage />} />
             </Route>
           </Route>
         </Route>
