@@ -1,5 +1,6 @@
 package com.todocodeacademy.sistema_planilla.aplication.service;
 
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.AsistenciaRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ConceptoPagoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpleadoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ParametroLegalRepositoryPort;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,9 @@ class PlanillaServiceTest {
 
     @Mock
     private ConceptoPagoRepositoryPort conceptoPagoRepo;
+
+    @Mock
+    private AsistenciaRepositoryPort asistenciaRepo;
 
     @InjectMocks
     private PlanillaService planillaService;
@@ -145,6 +150,20 @@ class PlanillaServiceTest {
                         new BigDecimal("113.00"), LocalDate.of(2024, 5, 1), null
                 )));
         when(planillaRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        // Simula que TODOS los días del rango consultado tienen entrada marcada, para que
+        // el cálculo automático de ausentismo (ver PlanillaService#aplicarAsistenciaAutomatica)
+        // no interfiera con lo que esta prueba en realidad verifica (asignación familiar y
+        // descuento de pensión). Se genera a partir de las fechas reales de la invocación en
+        // vez de un mes fijo, para no depender de a qué fecha caiga "hoy".
+        when(asistenciaRepo.findFechasConEntrada(any(), any(), any())).thenAnswer(invocation -> {
+            LocalDate desde = invocation.getArgument(1);
+            LocalDate hasta = invocation.getArgument(2);
+            List<LocalDate> todasLasFechas = new ArrayList<>();
+            for (LocalDate dia = desde; !dia.isAfter(hasta); dia = dia.plusDays(1)) {
+                todasLasFechas.add(dia);
+            }
+            return todasLasFechas;
+        });
         stubCatalogoConceptos();
 
         Planilla planilla = planillaService.generarPlanilla(7, 2026, TipoPlanilla.MENSUAL);

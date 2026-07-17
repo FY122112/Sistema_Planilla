@@ -200,7 +200,7 @@ HU-031: Registro de Asistencia Mensual
 •	Criterios de Validación:
 o	Los campos de texto superiores aceptarán valores enteros y flotantes, recalculando el valor proporcional sobre la base salarial del contrato de manera automática.
 •	Estado: Completado
-•	Nota: Implementado como entrada manual del Contador (no como derivación del marcado diario de Asistencia): la nueva pantalla "Editar remuneración" (PlanillaDetalleEditarPage.jsx) y el endpoint PUT /api/planillas/{id}/detalles/{idDetalle} calculan el impacto proporcional vía el descuento de Ausentismo (ver HU-032).
+•	Nota: Actualizado 2026-07-17 — al generar la planilla, días no laborados y minutos de tardanza ya se calculan automáticamente a partir de las marcas reales de Asistencia del mes (PlanillaService#aplicarAsistenciaAutomatica: días hábiles lunes-viernes sin entrada registrada, y suma de minutosTardanzas). El Contador conserva la pantalla "Editar remuneración" (PlanillaDetalleEditarPage.jsx) y el endpoint PUT /api/planillas/{id}/detalles/{idDetalle} para ajustar manualmente estos valores si hace falta corregir algo.
 •	Métricas: Valor: 200 | Prioridad: 1 | Estimación: 12h
 HU-032: Control Dinámico de Ausentismos
 •	Descripción: Como un Contador, necesito registrar los días no laborados injustificados del operario, con la finalidad de descontar proporcionalmente dichos días del haber total del periodo.

@@ -22,4 +22,10 @@ public interface AsistenciaRepositoryPort {
 
     List<Long> findIdsEmpleadosConAsistencia(List<Long> idsEmpleados, LocalDate fechaInicio, LocalDate fechaFin);
 
+    // Usados por PlanillaService para derivar automáticamente el ausentismo y la
+    // tardanza del mes a partir de las marcas reales de Asistencia (HU-031/HU-032/HU-033).
+    List<LocalDate> findFechasConEntrada(Long idEmpleado, LocalDate fechaInicio, LocalDate fechaFin);
+
+    int sumMinutosTardanza(Long idEmpleado, LocalDate fechaInicio, LocalDate fechaFin);
+
 }

@@ -78,4 +78,16 @@ public class AsistenciaRepositoryAdapter implements AsistenciaRepositoryPort {
                 .distinct()
                 .toList();
     }
+
+    @Override
+    public List<LocalDate> findFechasConEntrada(Long idEmpleado, LocalDate fechaInicio, LocalDate fechaFin) {
+        return repository.findFechaByEmpleado_IdEmpleadoAndFechaBetweenAndHoraEntradaIsNotNull(
+                idEmpleado, fechaInicio, fechaFin
+        );
+    }
+
+    @Override
+    public int sumMinutosTardanza(Long idEmpleado, LocalDate fechaInicio, LocalDate fechaFin) {
+        return repository.sumMinutosTardanzaByEmpleadoAndFechaBetween(idEmpleado, fechaInicio, fechaFin);
+    }
 }

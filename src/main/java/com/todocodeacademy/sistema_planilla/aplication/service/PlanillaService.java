@@ -3,6 +3,7 @@ package com.todocodeacademy.sistema_planilla.aplication.service;
 import com.todocodeacademy.sistema_planilla.aplication.command.DetalleMensualCommand;
 import com.todocodeacademy.sistema_planilla.aplication.command.ResumenMensual;
 import com.todocodeacademy.sistema_planilla.aplication.ports.input.PlanillaServicePort;
+import com.todocodeacademy.sistema_planilla.aplication.ports.output.AsistenciaRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.AuditoriaCambioRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.ConceptoPagoRepositoryPort;
 import com.todocodeacademy.sistema_planilla.aplication.ports.output.EmpleadoRepositoryPort;
@@ -18,11 +19,14 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class PlanillaService implements PlanillaServicePort {
     private final ConceptoPagoRepositoryPort conceptoPagoRepo;
     private final PlanillaExcelExporterPort excelExporter;
     private final AuditoriaCambioRepositoryPort auditoriaRepo;
+    private final AsistenciaRepositoryPort asistenciaRepo;
 
     // =========================
     // CRUD
@@ -291,13 +296,76 @@ public class PlanillaService implements PlanillaServicePort {
             detalle.actualizarAsignacionFamiliar(parametroAsignacion.getValor());
         }
 
-        // Al generar la planilla las 7 variables mensuales del detalle están todas en
-        // cero (ver DetallePlanilla constructor), así que este primer cálculo no agrega
-        // ningún movimiento derivado de asistencia; el Contador los agrega luego editando
-        // el detalle (ver PlanillaService#previsualizarDetalleMensual / #actualizarDetalleMensual).
+        // Días no laborados y minutos de tardanza se derivan automáticamente de las
+        // marcas reales de Asistencia del mes (HU-031/HU-032/HU-033); el resto de las
+        // variables mensuales (horas extra, vacaciones, bonificación, comisión) siguen
+        // siendo entrada manual del Contador, que además puede ajustar estas dos si hace
+        // falta corregir algo (ver PlanillaService#previsualizarDetalleMensual /
+        // #actualizarDetalleMensual).
+        aplicarAsistenciaAutomatica(detalle, empleado, planilla.getMes(), planilla.getAnio());
+
         aplicarVariablesMensuales(detalle, empleado, parametroEssalud, parametroVidaLey);
 
         return detalle;
+    }
+
+    // Cuenta como "día no laborado" cada día hábil (lunes a viernes) del mes, desde la
+    // fecha de ingreso del empleado si entró ese mismo mes, en el que no existe ninguna
+    // Asistencia con hora de entrada registrada. No se cuentan días futuros (si la
+    // planilla se genera antes de que termine el mes) ni fines de semana.
+    private void aplicarAsistenciaAutomatica(
+            DetallePlanilla detalle,
+            Empleado empleado,
+            Integer mes,
+            Integer anio
+    ) {
+
+        LocalDate inicioMes = LocalDate.of(anio, mes, 1);
+        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+        LocalDate hoy = LocalDate.now();
+
+        LocalDate desde = empleado.getFechaIngreso() != null && empleado.getFechaIngreso().isAfter(inicioMes)
+                ? empleado.getFechaIngreso()
+                : inicioMes;
+
+        LocalDate hasta = finMes.isAfter(hoy) ? hoy : finMes;
+
+        if (desde.isAfter(hasta)) {
+            return;
+        }
+
+        Long idEmpleado = empleado.getIdEmpleado();
+
+        Set<LocalDate> fechasConEntrada = new HashSet<>(
+                asistenciaRepo.findFechasConEntrada(idEmpleado, desde, hasta)
+        );
+
+        int minutosTardanza = asistenciaRepo.sumMinutosTardanza(idEmpleado, desde, hasta);
+
+        int diasNoLaborados = 0;
+        for (LocalDate dia = desde; !dia.isAfter(hasta); dia = dia.plusDays(1)) {
+
+            DayOfWeek diaSemana = dia.getDayOfWeek();
+            if (diaSemana == DayOfWeek.SATURDAY || diaSemana == DayOfWeek.SUNDAY) {
+                continue;
+            }
+
+            if (!fechasConEntrada.contains(dia)) {
+                diasNoLaborados++;
+            }
+        }
+
+        detalle.actualizarVariablesMensuales(
+                diasNoLaborados,
+                minutosTardanza,
+                detalle.getHorasExtras25(),
+                detalle.getHorasExtras35(),
+                detalle.getDiasVacacionesGozadas(),
+                detalle.getVacacionesFechaInicio(),
+                detalle.getVacacionesFechaFin(),
+                detalle.getBonificacionEficiencia(),
+                detalle.getComisionComercial()
+        );
     }
 
     // =========================
@@ -418,11 +486,13 @@ public class PlanillaService implements PlanillaServicePort {
     // VARIABLES MENSUALES (HU-031 a HU-045)
     // =========================
     //
-    // Traduce las 7 variables de entrada manual del detalle (días no laborados,
-    // minutos de tardanza, horas extra 25%/35%, días de vacaciones gozadas,
-    // bonificación de eficiencia, comisión comercial) en los movimientos monetarios
-    // correspondientes. Se llama tanto al generar la planilla (con las 7 variables en
-    // cero) como al editar un detalle ya existente (después de reiniciarMovimientos()).
+    // Traduce las 7 variables mensuales del detalle (días no laborados, minutos de
+    // tardanza, horas extra 25%/35%, días de vacaciones gozadas, bonificación de
+    // eficiencia, comisión comercial) en los movimientos monetarios correspondientes.
+    // Días no laborados y minutos de tardanza ya llegan calculados automáticamente desde
+    // Asistencia (ver aplicarAsistenciaAutomatica); el resto sigue siendo entrada manual
+    // del Contador. Se llama tanto al generar la planilla como al editar un detalle ya
+    // existente (después de reiniciarMovimientos()).
 
     private static final BigDecimal FACTOR_HORA_EXTRA_25 = new BigDecimal("1.25");
     private static final BigDecimal FACTOR_HORA_EXTRA_35 = new BigDecimal("1.35");
