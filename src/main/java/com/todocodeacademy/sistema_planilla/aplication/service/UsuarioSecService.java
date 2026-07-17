@@ -40,17 +40,6 @@ public class UsuarioSecService implements UsuarioSecServicePort {
                     throw new IllegalArgumentException("El email ya existe");
                 });
 
-        // Si se vincula a un Empleado, el rol EMPLEADO es obligatorio junto con los demás roles
-        if (usuarioSec.getEmpleado() != null) {
-            boolean tieneRolEmpleado = usuarioSec.getRoles().stream()
-                    .anyMatch(rol -> "EMPLEADO".equalsIgnoreCase(rol.getName()));
-
-            if (!tieneRolEmpleado) {
-                throw new IllegalArgumentException(
-                        "Un usuario vinculado a un empleado debe tener también el rol EMPLEADO");
-            }
-        }
-
         // 🔒 Encriptar contraseña antes de guardar
         usuarioSec.asignarContraseña(passwordEncoder.encode(usuarioSec.getPassword()));
 
@@ -89,14 +78,6 @@ public class UsuarioSecService implements UsuarioSecServicePort {
 
         if (usuarioSec.getEmpleado() != null) {
             actual.asignarEmpleado(usuarioSec.getEmpleado());
-
-            boolean tieneRolEmpleado = actual.getRoles().stream()
-                    .anyMatch(rol -> "EMPLEADO".equalsIgnoreCase(rol.getName()));
-
-            if (!tieneRolEmpleado) {
-                throw new IllegalArgumentException(
-                        "Un usuario vinculado a un empleado debe tener también el rol EMPLEADO");
-            }
         }
 
         return repository.save(actual);
