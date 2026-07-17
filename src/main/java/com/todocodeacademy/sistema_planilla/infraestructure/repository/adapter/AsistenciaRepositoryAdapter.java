@@ -54,6 +54,14 @@ public class AsistenciaRepositoryAdapter implements AsistenciaRepositoryPort {
 
         AsistenciaEntity saveEntity = repository.save(entity);
 
+        // AsistenciaEntMapper#toEntity solo pone el id en el Empleado de la entidad (referencia
+        // por FK, correcto para el insert/update). Al insertar (persist), Hibernate no resuelve
+        // esa referencia contra la fila real, así que saveEntity.getEmpleado() queda con nombre/
+        // demás campos en null y toDomain() revienta con "El nombre es obligatorio" pese a que
+        // el insert ya se guardó bien. Se restaura desde el Empleado de dominio ya completo
+        // (el mismo que entró a este método) en vez de confiar en lo que deja Hibernate.
+        saveEntity.setEmpleado(mapperEmp.toEntity(banco.getEmpleado()));
+
         return mapper.toDomain(saveEntity);
     }
 
