@@ -287,6 +287,13 @@ export default function UsuariosPage() {
             clearable
             mt="sm"
             {...form.getInputProps('empleadoId')}
+            onChange={(value) => {
+              form.setFieldValue('empleadoId', value);
+              const empleado = empleados.find((e) => String(e.idEmpleado) === value);
+              if (empleado?.correo) {
+                form.setFieldValue('email', empleado.correo);
+              }
+            }}
           />
           <Group justify="flex-end" mt="lg">
             <Button variant="default" onClick={close}>
@@ -317,6 +324,13 @@ export default function UsuariosPage() {
             searchable
             mt="sm"
             {...editForm.getInputProps('empleadoId')}
+            onChange={(value) => {
+              editForm.setFieldValue('empleadoId', value);
+              const empleado = empleados.find((e) => String(e.idEmpleado) === value);
+              if (empleado?.correo) {
+                editForm.setFieldValue('email', empleado.correo);
+              }
+            }}
           />
           <Switch
             label="Usuario activo"
